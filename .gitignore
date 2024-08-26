@@ -1,0 +1,52 @@
+# 가상 환경 디렉토리
+venv/
+env/
+.venv/
+env.bak/
+venv.bak/
+
+# Python 바이트 코드
+__pycache__/
+*.py[cod]
+
+# 로그 파일
+*.log
+
+# 테스트 결과
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+
+# IDE 및 편집기 설정
+.vscode/
+.idea/
+*.swp
+*.swo
+*.sublime-workspace
+*.sublime-project
+
+# 운영 체제 파일
+.DS_Store
+Thumbs.db
+
+# 패키지 및 배포 관련
+dist/
+build/
+*.egg-info/
+*.egg
+
+# 환경 변수 파일
+.env
+.env.local
+.env.*.local
+
+# 기타
+*.bak
+*.tmp
+*.pid
+*.gz
+*.tar
+*.zip
+*.rar
+*.7z
