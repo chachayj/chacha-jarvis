@@ -1,0 +1,38 @@
+#contents-guide {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  width: 100%; 
+  /* padding: 20px; */
+  color: #fff;
+}
+
+#contents-guide .fig {
+  display: inline-flex;
+  flex-direction: column;
+  width: 50%;
+  padding: 15px;
+  box-sizing: border-box;
+}
+
+#contents-guide .fig .step-no {
+  display: block;
+  width: 100%;
+  font-size: 1.25rem;
+  font-weight: bold;
+  line-height: 1.4;
+  text-indent: 0.5rem;
+  border-bottom: solid 1px #fff;
+}
+
+#contents-guide .content > * {
+  text-align: center;
+}
+
+#contents-guide .content .img-area {
+  position: relative;
+  padding: 15px 0;
+}
+#contents-guide .content .img-area img {
+  width: 50%;
+}

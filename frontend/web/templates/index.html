@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="initial-scale=1, width=device-width, viewport-fit=cover">
+    <meta name="theme-color" content="#000000" />
+    <meta name="description" content="" />
+    <link rel="apple-touch-icon" href="./logo192.png" />
+  
+    <title>ChaCha-Jarvis</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/reset.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/chat.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/guide.css') }}">
+    <script src="https://aka.ms/csspeech/jsbrowserpackageraw"></script>
+    <!-- voice activity detection-->
+    <script src="https://cdn.jsdelivr.net/npm/onnxruntime-web/dist/ort.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@ricky0123/vad-web@0.0.7/dist/bundle.min.js"></script>
+</head>
+<body>
+  <div id="appContainer">
+    <div id="header">
+      Seamless Insight with Generative AI
+    </div>
+    <div style="display: none">
+      <h2 style="background-color: white; width: 300px;">Avatar Control Panel</h2>
+      <label style="font-size: medium;" for="spokenText">Spoken Text:</label><br/>
+      <textarea id="spokenText" style="height:40px">안녕하세요 ChaCha-Jarvis 입니다. 무엇을 도와드릴까요?</textarea><br/>
+      <button id="startSession" onclick="window.startSession()">Start Session</button>
+      <button id="speak" onclick="window.speak()" disabled="disabled">Speak</button>
+      <button id="stopSpeaking" onclick="window.stopSpeaking()" disabled="disabled">Stop Speaking</button>
+      <button id="stopSession" onclick="window.stopSession()" disabled="disabled">Stop Session</button>
+      <br/>
+    </div>
+    
+    <div id="videoContainer" style="position: relative;">
+      <!-- <video id="video-idle" src="video/lisa-casual-sitting-idle_320.mp4" autoplay loop muted></video> -->
+      <!-- <div id="overlayArea" style="position: absolute;" hidden="hidden"> -->
+        <!-- Add your text or image controls here -->
+        <!-- <p id="overlayText" style="font-size: large;">Live Video</p> -->
+        <!-- <img id="overlayImage" src="your-image-source.png" alt="Overlay Image"> -->
+        <!-- </div> -->
+        <canvas id="canvas" style="background-color: transparent;"></canvas>
+        <canvas id="tmpCanvas" hidden="hidden"></canvas>
+        <div id="idleVideo">
+          <video id="video-idle" src="{{ url_for('static', filename='video/lisa-casual-sitting-idle_chromakey_compressed_480x270.mp4') }}" autoplay loop muted></video>
+        </div>
+      <div id="remoteVideo"></div>
+    </div>
+    
+    <div id="nav">
+      <div class="nav-item selected" data-nav="info">
+        <img src="{{ url_for('static', filename='img/ic-info.png') }}" alt="[i]">
+        <div class="label">info</div>
+      </div>
+      <div class="nav-item" data-nav="chat">
+        <img src="{{ url_for('static', filename='img/ic-chat.png') }}" alt="[C]">
+        <div class="label">concierge</div>
+      </div>
+      <div class="pointer"></div>
+    </div>
+
+    <div id="info" class="main-content">
+      <img src="{{ url_for('static', filename='img/chacha-jarvis_logo.webp') }}" alt="">
+      <p style="text-align: center; font-weight: bold; font-size: 1.5rem">
+        << ChaCha-Jarvis >>
+      </p>
+      <p>
+        1. Chatgpt와 Azure Avartar, 라즈베리 파이4를 활용한 LLM 토이 프로젝트입니다<br><br>
+        2. 최초 웹 로드시 Azure Avartar에 WebRTC 연결을 진행해 버츄얼휴먼의 영상을 스트리밍합니다<br><br>
+        3. Hotword detection을 사용하여 <br>
+        "자비스"라는 언어에 반응하여 wake up을 합니다.<br><br>
+        4. wake up후에는 약 5초간 listen 모드에 들어가며 listen 모드에서는 라즈베리 파이4 제어 혹은 질문을 할수 있습니다. <br>
+        질문에 대한 STT는 openai의 STT API로 수행합니다.<br><br>
+        5. 라즈베리 파이4 제어는 websocket으로 통신하며 질문에 대한 LLM 대답은 openai의 LLM API로 수행합니다. <br><br>
+        6. 수행에 대한 결과는 Azure Avartar의 Speech API를 통한 음성 발화로 수행됩니다.
+      </p>
+    </div>
+
+    <div id="chat" class="main-content hidden">
+      <div class="bubble jarvis">안녕하세요. 저는 ChaCha-Jarvis 입니다. 궁금하신 사항이 있으시면 언제든지 물어봐 주세요!</div>
+      <div class="bubble jarvis">마이크 권한을 승인해 주시고, 마이크를 통해 물어보시면 됩니다.</div> 
+    </div>
+    
+    <div class="empty" style="height: 108px"></div>
+
+    <div id="mic-section">
+      <div id="play-session" onclick="window.toggleRecord()"></div>
+    </div>
+
+    <!-- Configureation -->
+    <div id="configuration" style="display: none">
+      <h2 style="background-color: white; width: 300px;">Azure Speech Resource</h2>
+      <label style="font-size: medium;" for="region">Region:</label>
+      <select id="region" style="font-size: medium;">
+        <option value="westus">West US</option>
+        <option value="westus2">West US 2</option>
+        <option value="eastus" selected="selected">East US</option>
+        <option value="eastus2">East US 2</option>
+        <option value="eastasia">East Asia</option>
+        <option value="southeastasia">South East Asia</option>
+        <option value="centralindia">Central India</option>
+        <option value="northeurope">North Europe</option>
+        <option value="westeurope">West Europe</option>
+      </select>
+      <label style="font-size: medium;" for="subscriptionKey">Subscription Key:</label>
+      <!-- 변경  -->
+      <input id="subscriptionKey" type="password" size="32" style="font-size: medium;" value="35b9ce0631054142b73cf41b52a40c89"/><br />
+    
+      <h2 style="background-color: white; width: 300px;">ICE Server</h2>
+      <label style="font-size: medium;" for="iceServerUrl">URL:</label>
+      <!-- 변경  -->
+      <input id="iceServerUrl" type="text" size="64" style="font-size: medium;"
+        value="turn:relay.communication.microsoft.com:3478"></input><br />
+      <label style="font-size: medium;" for="iceServerUsername">Username:</label>
+      <!-- 변경  -->
+      <input id="iceServerUsername" type="text" size="64" style="font-size: medium;" value="BQAANlN1BAAB2nD/BXc1a7i3sEMyAIyRjLcsu9PiHpcAAAAMARCAvSCpn5hOf5fUvc7UIyK4H8qYn3v5xIEuaa9YkXZjbR7FWy8="/><br />
+      <label style="font-size: medium;" for="iceServerCredential">Credential:</label>
+      <!-- 변경  -->
+      <input id="iceServerCredential" type="password" size="32" style="font-size: medium;" value="N9JNHd/XBNoRvP8oKD9Zbe45t8w=" /><br />
+      <br />
+    
+      <h2 style="background-color: white; width: 300px;">TTS Configuration</h2>
+      <label style="font-size: medium;" for="ttsVoice">TTS Voice:</label>
+      <input id="ttsVoice" type="text" size="32" style="font-size: medium;" value="en-US-JennyMultilingualV2Neural"></input><br />
+      <label style="font-size: medium;" for="customVoiceEndpointId">Custom Voice Deployment ID (Endpoint ID):</label>
+      <input id="customVoiceEndpointId" type="text" size="32" style="font-size: medium;" value=""></input><br />
+      <br />
+    
+      <h2 style="background-color: white; width: 300px;">Avatar Configuration</h2>
+      <label style="font-size: medium;" for="talkingAvatarCharacter">Avatar Character:</label>
+      <input id="talkingAvatarCharacter" type="text" size="16" style="font-size: medium;" value="lisa"></input><br />
+      <label style="font-size: medium;" for="talkingAvatarStyle">Avatar Style:</label>
+      <input id="talkingAvatarStyle" type="text" size="16" style="font-size: medium;" value="casual-sitting"></input><br />
+      <label style="font-size: medium;" for="backgroundColor">Background Color:</label>
+      <input id="backgroundColor" type="text" size="16" style="font-size: medium;" value="#FFFFFFFF"></input><br />
+      <div style="background-color: white; width: 200px;">
+        <input type="checkbox" id="customizedAvatar">Custom Avatar</input><br />
+        <input type="checkbox" id="transparentBackground" onchange="window.updataTransparentBackground()" checked>Transparent
+        Background</input><br />
+        <input type="checkbox" id="videoCrop" checked>Video Crop</input><br />
+      </div>
+      <br />
+    </div>
+    
+    <!-- Loggin -->
+    <div style="display: none">
+      <h2 style="background-color: white; width: 300px;">Logs</h2>
+      <div id="logging" style="background-color: white;"></div>
+    </div>
+
+    <div class="up_sensor"></div>
+    <div id="bottomSheet" class="bottom_sheet">
+      <div class="bottom_sheet_handle_wrap">
+        <div class="bottom_sheet_handle"></div>
+      </div>
+      <div class="title">GUIDE</div>
+      <div style="margin-bottom: 40px;"></div>
+      <div class="bottom_box">
+        <div id="contents-guide">
+          <div class="fig" data-no="1">
+            <div class="step-no">Step 1</div>
+            <div class="content">
+              <div class="img-area">
+                <img src="{{ url_for('static', filename='img/guide/guide_fig3.png') }}">
+              </div>
+              <div class="text-area">
+                웹사이트의 마이크 권한을 승인합니다
+              </div>
+            </div>
+          </div>
+
+          <div class="fig" data-no="2">
+            <div class="step-no">Step 2</div>
+            <div class="content">
+              <div class="img-area">
+                <img src="{{ url_for('static', filename='img/guide/guide_fig4.png') }}">
+              </div>
+              <div class="text-area">
+                휴대폰의 마이크를 통해<br>ChaCha-Jarvis와 대화합니다
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="muted-cover" onclick="window.unMuted()">
+    <img src="{{ url_for('static', filename='img/ic-volume-mute.png') }}" alt="Muted"/>
+    <span>탭 하여 음소거 해제</span>
+  </div>
+  <audio id="audioPlayer" controls style="display: none"></audio>
+  <form id="uploadForm" action="/upload" method="post" enctype="multipart/form-data" style="display: none;">
+    <input type="hidden" name="audio_data">
+  </form>
+</body>
+<script src="{{ url_for('static', filename='js/chat.js') }}"></script>
+<script src="{{ url_for('static', filename='js/voiceRecorder.js') }}"></script>
+<script src="{{ url_for('static', filename='js/basic.js') }}"></script>
+<script src="{{ url_for('static', filename='js/app.js') }}"></script>
+
+</html>
