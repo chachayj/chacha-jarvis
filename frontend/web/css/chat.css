@@ -1,0 +1,80 @@
+* {
+	scrollbar-color: rgb(77, 77, 93) transparent;
+	scrollbar-width: thin;
+}
+
+/* // code necessary to get the scrollbar to look as great in Blink browsers as it does in Firefox. :( */
+::-webkit-scrollbar {
+		background: #fff;
+		height: .6em;
+    width: .6em;
+}
+
+::-webkit-scrollbar-track {
+    background: #fff;
+}
+
+::-webkit-scrollbar-thumb {
+	box-sizing: content-box;
+	border-radius: 10px;
+	/* border: 2px solid #eee; */
+	background: rgb(77, 77, 93);
+}
+
+
+#chat {
+	align-items: flex-start;
+	/* background: white; */
+	/* border-radius: 1em; */
+	/* box-shadow: 0 1em 1em rgba(0,0,0,0.05); */
+	display: flex;
+	flex-direction:column;
+	line-height: 1.4;
+	/* max-height: calc(100vh - 4em); */
+	/* min-height: 50vh; */
+	/* min-width: 15em; */
+	/* margin: auto; */
+	margin: 1em 0;
+	overflow: auto;
+	position: relative;
+	padding: 1em;
+	flex: 1;
+	/* // transform: translate(0,0); // sadly doesn't work. */
+}
+
+.bubble {
+	background: #424148;
+	border-radius: .5em;
+	margin-bottom: .25em;
+	max-width: 30ch;
+	padding: .5em 1em;
+	pointer-events: none;
+	box-shadow: 0 1px 3px rgba(0,0,0,.3);
+}
+
+.mine {
+	color: #d1d1d1;
+	align-self: flex-end;
+	border-radius: .5em .5em 0 .5em;
+	margin-bottom: 0.25em;
+}
+.jarvis + .mine {
+	margin-top: 0.5em;
+}
+
+.jarvis {
+	align-self: flex-start;
+	/* background-color: rgb(255, 143, 178); */
+	background-image: linear-gradient(transparent 0%, rgb(248, 56, 101) 60%, rgb(60, 26, 195) 80%, rgb(60, 139, 200) 100%);
+	background-attachment: fixed;
+	border-radius: .5em .5em .5em 0;
+	color: white;
+	/* // You could play with these values to make it work in smaller windows. Facebook is already calculating that size so this shouldn't be too hard.
+	// background-size: 100% 20em; // the size of the window
+	// background-position: 10em 10em; // where the top left position of the window is
+	// background-repeat: no-repeat; // don't repeat it cause it may look weird */
+
+}
+.mine + .jarvis {
+	margin-top: 0.5em;
+}
