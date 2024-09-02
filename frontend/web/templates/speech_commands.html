@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hotword Detection: "자비스"</title>
+    <script src="../static/js/lib/tfjs.js"></script>
+    <script src="../static/js/lib/tfjs-speech-commands.js"></script>
+</head>
+<body>
+    <h1>핫워드 감지: "자비스"</h1>
+    <p id="status">모델을 로드 중입니다...</p>
+    <p id="response"></p>
+    <p id="word-list">단어 목록을 로드 중입니다...</p>
+    <script>
+        async function loadModel() {
+            const recognizer = speechCommands.create('BROWSER_FFT');
+            await recognizer.ensureModelLoaded();
+            
+            
+            // 미리 훈련된 단어 목록 표시
+            const words = recognizer.wordLabels();
+            const wordListDiv = document.getElementById('word-list');
+            wordListDiv.innerHTML = `<strong>미리 훈련된 단어 목록:</strong><ul>${words.map(word => `<li>${word}</li>`).join('')}</ul>`;
+            
+            document.getElementById('status').innerText = "모델이 로드되었습니다. '세븐(seven)'이라고 말해보세요.";
+            return recognizer;
+        }
+
+        function playResponse() {
+            const msg = new SpeechSynthesisUtterance("네 무엇을 도와드릴까요?");
+            msg.lang = "ko-KR";
+            window.speechSynthesis.speak(msg);
+        }
+
+        async function startListening() {
+            const recognizer = await loadModel();
+
+            recognizer.listen(result => {
+                const scores = result.scores; // 모델의 예측 점수
+                const labels = recognizer.wordLabels(); // 인식 가능한 단어 목록
+
+                console.log("result : ", result)
+                labels.forEach((label, i) => {
+                    // 여기서는 "yes"를 "스텔라"로 가정
+                    
+                    if (label === "seven" && scores[i] > 0.75) { // 임계치 0.75
+                        console.log("scores[i] : ", scores[i])
+                        document.getElementById('response').innerText = "네 무엇을 도와드릴까요?";
+                        playResponse();
+                    }
+                });
+            }, {
+                probabilityThreshold: 0.75, // 임계치 설정
+                includeSpectrogram: false,
+                overlapFactor: 0.5 // 오디오 처리 중복 비율
+            });
+
+            // 필요 시 중지하려면 recognizer.stopListening();
+        }
+
+        startListening();
+    </script>
+</body>
+</html>

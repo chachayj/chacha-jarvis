@@ -18,44 +18,18 @@ Chacha-jarvis(monorepo)/
 │   └── go_fiber_server/
 │       └── main.go
 ├── embeded/
+│   ├── ai/
+│   │   └── training-tfjs/
 │   ├── ros/
 │   │   └── rospy_app.py
 └── frontend/
     ├── web/
-    │   ├── reactjs/
-    │   │   ├── public/
-    │   │   │   └── index.html
-    │   │   ├── src/
-    │   │   │   ├── components/
-    │   │   │   ├── hooks/
-    │   │   │   ├── pages/
-    │   │   │   └── styles/
-    │   │   └── package.json
-    │   ├── vuejs/
-    │   │   ├── public/
-    │   │   │   └── index.html
-    │   │   ├── src/
-    │   │   │   ├── assets/
-    │   │   │   ├── components/
-    │   │   │   ├── router/
-    │   │   │   └── views/
-    │   │   └── package.json
-    │   └── nextjs/
-    │       ├── public/
-    │       │   └── images/
-    │       ├── src/
-    │       │   ├── components/
-    │       │   ├── pages/
-    │       │   └── styles/
-    │       └── package.json
-    ├── ios/
-    │   ├── src/
-    │   │   ├── AppDelegate.swift
-    │   │   └── ViewController.swift
-    │   └── Info.plist
-    └── android/
-        ├── src/
-        │   ├── MainActivity.java
-        │   └── MainApplication.java
-        └── AndroidManifest.xml
+    │   ├── static/
+    │   │   └── augmented_audio
+    │   │   └── css
+    │   │   └── img
+    │   │   └── js
+    │   ├── templates/
+    │   │   └── index.html
+
 ```
