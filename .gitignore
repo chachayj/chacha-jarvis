@@ -9,6 +9,9 @@ venv.bak/
 __pycache__/
 *.py[cod]
 
+# Nodejs modules
+node_modules
+
 # 로그 파일
 *.log
 
