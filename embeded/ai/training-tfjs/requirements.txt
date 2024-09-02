@@ -1,0 +1,28 @@
+# gtts: Google Text-to-Speech
+gtts==2.5.3
+
+# pydub: 오디오 파일 처리
+pydub==0.25.1
+
+# numpy: 숫자 연산 및 배열 처리
+numpy==2.1.0
+
+# scipy: 과학 및 공학 계산
+scipy==1.14.1
+
+# librosa: 음성 및 음악 분석
+librosa==0.10.2.post1
+
+# tensorflow: 머신러닝 및 딥러닝 라이브러리
+tensorflow==2.17.0
+
+# tensorflowjs: tensorflow 파일을 js로 변환하기위해 설치
+tensorflowjs==4.20.0
+
+# ffmpeg: 오디오 및 비디오 파일 변환
+ffmpeg==1.4
+
+
+matplotlib==3.9.2
+
+tqdm==4.66.5
