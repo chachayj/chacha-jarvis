@@ -1,0 +1,19 @@
+{
+  "name": "training-tfjs",
+  "version": "1.0.0",
+  "description": "tensorflow.js 파일을 커스텀 러닝 시키기위해",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@tensorflow/tfjs": "^4.20.0",
+    "@tensorflow/tfjs-converter": "^4.20.0"
+  },
+  "dependencies": {
+    "@tensorflow/tfjs-node": "^4.20.0"
+  }
+}
