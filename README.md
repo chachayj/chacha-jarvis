@@ -7,7 +7,14 @@ FrontEnd, BackEnd, Embeded 3개의 영역을 폴더별로 정리하였고
 
 하위 요소들별 폴더를 만들은 mono repo 형태이다.
 
+# Jira의 Scrum board를 통해 1주 주기 Sprint 진행
 
+Sprint를 통해 개발일정 스케줄링, 깃헙과 연동하여 백로그와 연동된 commit 관리.
+
+![alt text](./img/sprint_timeline.png)
+![alt text](./img/sprint_report.png)
+![alt text](./img/sprint_backlog.png)
+![alt text](./img/sprint_code.png)
 
 # 구상중인 디렉토리 구조 (안)
 ```
