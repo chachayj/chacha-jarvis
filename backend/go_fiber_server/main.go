@@ -1,6 +1,7 @@
 package main
 
 import (
+	"log"
     "github.com/gofiber/fiber/v2"
 )
 
@@ -14,5 +15,8 @@ func main() {
     })
 
     // 서버 시작
-    app.Listen(":3000")
+	err := app.Listen(":3000")
+	if err != nil {
+		log.Fatalf("Error starting server: %v", err)
+	}
 }
