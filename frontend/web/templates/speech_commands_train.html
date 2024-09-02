@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>"자비스" 음성 인식 모델</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+    <script defer src="{{ url_for('static', filename='js/script.js') }}"></script>
+</head>
+<body>
+    <h1>"자비스" 음성 인식 모델</h1>
+    <p id="status">모델을 훈련시키려면 버튼을 클릭하세요.</p>
+    <button id="trainBtn">모델 훈련 시작</button>
+    <button id="startListeningBtn" disabled>듣기 시작</button>
+    <p id="result"></p>
+</body>
+</html>

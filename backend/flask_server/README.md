@@ -26,7 +26,7 @@ pip3 install -r requirements.txt
 
 # 2. run
 ```
-python app.py
+python3 ./src/app.py
 ```
 
  * Running on http://127.0.0.1:5000
