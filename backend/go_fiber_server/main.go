@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	initModules "go_fiber_server/src/init"
 
 	"github.com/joho/godotenv"
 
@@ -27,10 +28,8 @@ func main() {
 		ExposeHeaders: "Content-Length,Content-Range",
 	}))
 
-    // 루트 라우트 설정
-    app.Get("/", func(c *fiber.Ctx) error {
-        return c.SendString("Hello, Fiber!")
-    })
+	// Initialize dependencies and setup routes
+	initModules.InitialModules(app)
 
     // 서버 시작
 	err := app.Listen(":3000")
