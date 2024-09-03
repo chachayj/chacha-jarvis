@@ -17,6 +17,7 @@ func InitialModules(app *fiber.App) {
 
 	// Setup routes
 	routerManager := routes.NewMainRouter(
+		dependencies.get_weather_handler,
 		dependencies.post_robot_control_handler,
 	)
 	routerManager.Setup(app)
