@@ -1,0 +1,1 @@
+ssh -i ~/Desktop/work/pem/go_fiber_server.pem ubuntu@ec2.ap-northeast-2.compute.amazonaws.com

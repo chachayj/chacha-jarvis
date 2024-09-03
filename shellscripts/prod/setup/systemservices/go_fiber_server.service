@@ -1,0 +1,16 @@
+[Unit]
+Description=go_fiber_server
+After=network.target
+
+[Install]
+WantedBy=multi-user.target
+
+[Service]
+User=ubuntu
+Group=ubuntu
+PermissionsStartOnly=true
+ExecStart=/home/ubuntu/go_fiber_server/go_fiber_server
+WorkingDirectory=/home/ubuntu/go_fiber_server
+TimeoutSec=600
+Restart=on-failure
+RuntimeDirectoryMode=755
