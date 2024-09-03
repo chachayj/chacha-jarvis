@@ -19,3 +19,14 @@ go get github.com/gofiber/fiber/v2
 
 go run main.go
 
+
+# robot api call 캡처
+
+- postman api call
+
+![alt text](postman_api_call.png)
+
+
+- mqttx mqtt spying
+
+![alt text](mqtt_comunicate.png)
