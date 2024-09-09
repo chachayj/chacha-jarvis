@@ -1,5 +1,7 @@
 # chacha-jarvis-be-go
 
+frontend/web에서 API call을 요청하는 go fiber 프레임워크를 사용한 core backend
+
 - 언어
 go1.22.5
 

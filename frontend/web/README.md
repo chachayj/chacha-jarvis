@@ -2,6 +2,8 @@
 
 azure avartar demo 기반의 샘플 코드로 작업 진행
 
+(추후 reactjs 혹은 nextjs로 리팩터링 예정.)
+
 https://github.com/Azure-Samples/cognitive-services-speech-sdk/tree/master/samples/js/browser/avatar
 
 # hot word detection 구현 (tensorflow.js 사용)
