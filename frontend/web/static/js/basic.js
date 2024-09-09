@@ -343,6 +343,6 @@ window.sendTextAndSpeak = (msg) => {
 }
 
 window.updataTransparentBackground();
-window.startVAD();
+// window.startVAD();
 
 window.startSession();

@@ -16,6 +16,8 @@
     <!-- voice activity detection-->
     <script src="https://cdn.jsdelivr.net/npm/onnxruntime-web/dist/ort.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@ricky0123/vad-web@0.0.7/dist/bundle.min.js"></script>
+    <script src="../static/js/lib/tfjs.js"></script>
+    <script src="../static/js/lib/tfjs-speech-commands.js"></script>
 </head>
 <body>
   <div id="appContainer">
@@ -34,18 +36,10 @@
     </div>
     
     <div id="videoContainer" style="position: relative;">
-      <!-- <video id="video-idle" src="video/lisa-casual-sitting-idle_320.mp4" autoplay loop muted></video> -->
-      <!-- <div id="overlayArea" style="position: absolute;" hidden="hidden"> -->
-        <!-- Add your text or image controls here -->
-        <!-- <p id="overlayText" style="font-size: large;">Live Video</p> -->
-        <!-- <img id="overlayImage" src="your-image-source.png" alt="Overlay Image"> -->
-        <!-- </div> -->
-        <canvas id="canvas" style="background-color: transparent;"></canvas>
-        <canvas id="tmpCanvas" hidden="hidden"></canvas>
-        <div id="idleVideo">
-          <video id="video-idle" src="{{ url_for('static', filename='video/lisa-casual-sitting-idle_chromakey_compressed_480x270.mp4') }}" autoplay loop muted></video>
-        </div>
-      <div id="remoteVideo"></div>
+      <!-- 로고 이미지로 교체 -->
+      <img id="logoImage" src="{{ url_for('static', filename='img/chacha-jarvis_logo.webp') }}" alt="ChaCha-Jarvis Logo" style="width: 100%; height: 100%;">
+      <canvas id="canvas" style="background-color: transparent;"></canvas>
+      <canvas id="tmpCanvas" hidden="hidden"></canvas>
     </div>
     
     <div id="nav">
@@ -70,10 +64,21 @@
         2. 최초 웹 로드시 Azure Avartar에 WebRTC 연결을 진행해 버츄얼휴먼의 영상을 스트리밍합니다<br><br>
         3. Hotword detection을 사용하여 <br>
         "자비스"라는 언어에 반응하여 wake up을 합니다.<br><br>
+
+        현재는 러닝 모델 성능이 좋지않아 Hotword detection을 사용하여 <br>
+        "Seven"이라는 tensorflow의 사전 학습 언어에 반응하여 wake up을 합니다.<br><br>
+
         4. wake up후에는 약 5초간 listen 모드에 들어가며 listen 모드에서는 라즈베리 파이4 제어 혹은 질문을 할수 있습니다. <br>
         질문에 대한 STT는 openai의 STT API로 수행합니다.<br><br>
-        5. 라즈베리 파이4 제어는 websocket으로 통신하며 질문에 대한 LLM 대답은 openai의 LLM API로 수행합니다. <br><br>
-        6. 수행에 대한 결과는 Azure Avartar의 Speech API를 통한 음성 발화로 수행됩니다.
+
+        현재는 Openai는 지속 비용이 발생하므로 tensorflow의 사전 학습 언어로만 간단한 제어, 날씨, naver 뉴스 API의 정보를 받아오는 형태로 구현되었습니다.<br><br>
+        추후 fast-whisper를 사용하여 백엔드 서버에 간단한 임베딩 STT를 구현할 예정입니다. <br><br>
+
+        5. 라즈베리 파이4 제어는 websocket으로 통신하며 질문에 대한 LLM 대답은 openai의 LLM API로 수행합니다. <br>
+        현재는 정해진 대답만을 응답합니다.
+        <br><br>
+        6. 수행에 대한 결과는 Azure Avartar의 Speech API를 통한 음성 발화로 수행됩니다.<br>
+        <미구현>
       </p>
     </div>
 
@@ -196,8 +201,10 @@
   </form>
 </body>
 <script src="{{ url_for('static', filename='js/chat.js') }}"></script>
-<script src="{{ url_for('static', filename='js/voiceRecorder.js') }}"></script>
+<!-- <script src="{{ url_for('static', filename='js/voiceRecorder.js') }}"></script> -->
+ <script src="{{ url_for('static', filename='js/hotword.js') }}"></script>
 <script src="{{ url_for('static', filename='js/basic.js') }}"></script>
 <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+
 
 </html>
