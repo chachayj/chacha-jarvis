@@ -1,4 +1,7 @@
 # chacha-jarvis-be-flask
+
+frontend/web 의 html들을 호스팅하기 위한 flask 프레임워크를 사용한 backend
+
 # bash
 ```
 python3 --version

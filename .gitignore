@@ -40,7 +40,7 @@ build/
 *.egg
 
 # 환경 변수 파일
-.env
+# .env
 .env.local
 .env.*.local
 
