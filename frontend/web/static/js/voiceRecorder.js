@@ -22,7 +22,7 @@ const startRecordWithTimeout = () => {
     // console.log("myvad: ", myvad);
     myvad.options.onSpeechEnd();
     // stopRecord();
-  }, 3000); // 10초(10000ms) 시간 설정
+  }, 1000); // 10초(10000ms) 시간 설정
 };
 
 const stopRecordWithTimeout = () => {
@@ -104,7 +104,7 @@ window.startVAD = async () => {
       stopRecordWithTimeout();
       
       // 음성 데이터를 사용하여 STT 및 LLM 작업을 수행
-      console.log(" call 전에: ", audioBuffer);
+      // console.log(" call 전에: ", audioBuffer);
       if (audioBuffer === undefined) {
         pendingAPI = false;
         document.getElementById('header').style.backgroundColor = 'green';
