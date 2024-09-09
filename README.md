@@ -7,7 +7,7 @@ FrontEnd, BackEnd, Embeded 3개의 영역을 폴더별로 정리하였고
 
 하위 요소들별 폴더를 만들은 mono repo 형태이다.
 
-# 프로젝트 러닝 방법
+# 프로젝트 running 방법
 
 - backend flask_server를 구동시켜서 웹애플리케이션을 호스팅하며
 - backend go_fiber_server를 구동시켜서 웹앱플리케이션과 상호작용을 진행.
