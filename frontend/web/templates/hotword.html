@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hotword Detection</title>
+</head>
+<body>
+    <p id="message">Waiting for hotword...</p>
+
+    <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
+    <script>
+        const socket = io();
+
+        // Web Speech API를 사용하여 음성 인식 설정
+        const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+        recognition.lang = 'en-US';
+        recognition.interimResults = false;
+        recognition.continuous = true; // 음성 인식을 지속적으로 수행
+
+        recognition.onresult = (event) => {
+            console.log('event:', event);
+            const transcript = event.results[0][0].transcript.toLowerCase();
+            console.log('Transcript:', transcript);
+
+            const hotword = 'nova'; // 핫워드 설정
+            const hotword2 = 'nopa'; // 핫워드 설정
+            if (transcript.includes(hotword) || transcript.includes(hotword2)) {
+                console.log(`Hotword '${hotword}' detected!`);
+                socket.emit('hotword_detected', { message: `Hotword '${hotword}' detected!` });
+                document.getElementById('message').innerText = `Hotword '${hotword}' detected!`;
+            } else {
+              document.getElementById('message').innerText = `인식된 명령어 '${transcript}' failed !`;
+            }
+
+            recognition.abort(); // 현재 음성 인식 중지
+        };
+
+        recognition.onerror = (event) => {
+            console.error('Speech recognition error:', event.error);
+        };
+
+        recognition.onend = () => {
+            console.log('Speech recognition ended. Restarting...');
+            recognition.start(); // 인식이 종료되면 다시 시작
+        };
+
+        recognition.start(); // 음성 인식 시작
+    </script>
+</body>
+</html>

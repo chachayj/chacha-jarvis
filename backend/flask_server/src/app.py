@@ -13,7 +13,7 @@ def index():
 
 @app.route('/hotword')
 def hotword():
-    return render_template('speech_commands.html')
+    return render_template('hotword.html')
 
 @app.route('/hotword-train')
 def hotwordTrain():
