@@ -1,6 +1,14 @@
 # chacha-jarvis
 Ai 비서를 이용한 전구, 모터, 센서 등 라즈베리 디바이스들을 제어하는 IoT 시스템 프로젝트
 
+# 구동 방법
+
+# 도커 컴포즈 도입
+
+# Plane 도입
+
+# postgresql 도입
+
 # 프로젝트 구조
 
 FrontEnd, BackEnd, Embeded 3개의 영역을 폴더별로 정리하였고
