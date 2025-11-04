@@ -1,0 +1,22 @@
+version: "3.8"
+
+services:
+  # =====================================================
+  # EMQX MQTT Broker
+  # =====================================================
+  emqx:
+    extends:
+      file: ./emqx/docker-compose.yml
+      service: emqx
+
+  # =====================================================
+  # Fiber Server
+  # =====================================================
+  fiber-server:
+    extends:
+      file: ./backend/go_fiber_server/docker-compose.yml
+      service: fiber-server
+
+networks:
+  chacha_net:
+    driver: bridge

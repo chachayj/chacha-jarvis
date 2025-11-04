@@ -1,13 +1,44 @@
 # chacha-jarvis
+
 Ai 비서를 이용한 전구, 모터, 센서 등 라즈베리 디바이스들을 제어하는 IoT 시스템 프로젝트
+
+기존 V1 버전은 [리드미 V1](README-V1.md) 에서 참조
+
+2025.11.04 버전 2 진행 시작 (개발 완료 시점에 버전2 완료시점 기입 예정)
+
+3D 엔진 Cesium, OSM(OpenStreetMap) 도입과 음성 챗봇, Ollama 모델 변경 진행, 라즈베리 파이 작업 및 도커 컴포즈화 진행 + Plane 스크럼 보조 툴 도입 예정
+
+# 사전 설치 : WSL2 + 도커 + 도커 컴포즈
+
+root경로의 README-WSL2-INSTALL.md [리드미 WSL2 인스톨](README-WSL2-INSTALL.md) 참조.
 
 # 구동 방법
 
-# 도커 컴포즈 도입
+현재 모든 세팅은 wsl 2, ubuntu 22.04 + 도커로 세팅합니다.
 
-# Plane 도입
+```
+emqx certs 인증서 생성용
+chmod +x emqx/init_emqx.sh
+chmod +x backend/go_fiber_server/wait-for-it.sh
+```
 
-# postgresql 도입
+
+```
+docker compose down --remove-orphans
+docker compose up --build
+```
+
+# EMQX Mqtt 브로커 도커 설치
+
+[리드미 EMQX](README-EMQX.md) 참조.
+
+# Plane 스크럼 플래닝 툴 도커 설치
+
+[리드미 Plane](README-Plane.md) 참조.
+
+# postgresql DB 도커 설치
+
+[리드미 postgresql](README-postgresql.md) 참조.
 
 # 프로젝트 구조
 
@@ -22,14 +53,8 @@ FrontEnd, BackEnd, Embeded 3개의 영역을 폴더별로 정리하였고
 
 기본적으로 온프레미스 베이스에서 구동가능하도록 구현하였으며 ec2 셋업도 가능한 프로젝트이다.
 
-# Jira의 Scrum board를 통해 1주 주기 Sprint 진행
+# Plane의 프로젝트 Scrum board를 통해 1주 주기 Sprint 진행 (재직이슈로 일정한 작업 맨데이를 가지진 못함.)
 
-Sprint를 통해 개발일정 스케줄링, 깃헙과 연동하여 백로그와 연동된 commit 관리.
-
-![alt text](./img/sprint_timeline.png)
-![alt text](./img/sprint_report.png)
-![alt text](./img/sprint_backlog.png)
-![alt text](./img/sprint_code.png)
 
 # 구상중인 디렉토리 구조 (안)
 ```
