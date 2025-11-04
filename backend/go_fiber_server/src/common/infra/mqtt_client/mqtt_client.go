@@ -40,9 +40,21 @@ func NewMqttBroker() *MqttBroker {
 	}
 
 	// 인증서 경로를 현재 작업 디렉토리를 기준으로 설정
-	caCertFile := filepath.Join(basePath, caCertPath)
-	clientCertFile := filepath.Join(basePath, clientCertPath)
-	clientKeyFile := filepath.Join(basePath, clientKeyPath)
+	// caCertFile := filepath.Join(basePath, caCertPath)
+	// clientCertFile := filepath.Join(basePath, clientCertPath)
+	// clientKeyFile := filepath.Join(basePath, clientKeyPath)
+	// 인증서 경로를 절대경로면 그대로, 상대경로면 /app 기준으로 처리
+	resolvePath := func(path string) string {
+		if filepath.IsAbs(path) {
+			return path
+		}
+		return filepath.Join(basePath, path)
+	}
+
+	// TLS 인증서 파일 경로
+	caCertFile := resolvePath(caCertPath)
+	clientCertFile := resolvePath(clientCertPath)
+	clientKeyFile := resolvePath(clientKeyPath)
 
 	opts := MQTT.NewClientOptions()
 	opts.AddBroker(fmt.Sprintf("ssl://%s:%s", mqttBrokerAddress, mqttPort))
