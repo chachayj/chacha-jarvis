@@ -56,6 +56,16 @@ go run main.go
 # robot api call 캡처
 
 - postman api call
+```
+스웨거 세팅은 현재 준비되지 않아서 리드미로 대체
+robot 컨트롤 API 
+Method : POST
+URL : http://127.0.0.1:3000/robots/1/control
+Payload :
+{
+    "Command" : "turn off camera"
+}
+```
 
 ![alt text](postman_api_call.png)
 

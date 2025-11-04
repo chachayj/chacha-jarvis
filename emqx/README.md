@@ -43,3 +43,6 @@ topic
 
 ![alt text](MQTTX-spying.png)
 
+# emqx는 아래와 같이 대시보드도 제공
+
+![alt text](emqx-dashboard.png)
