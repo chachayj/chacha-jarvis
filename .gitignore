@@ -53,3 +53,10 @@ build/
 *.zip
 *.rar
 *.7z
+
+# =====================================================
+# EMQX auto-generated certificates and runtime data
+# =====================================================
+emqx/certs/
+emqx/data/
+emqx/log/
