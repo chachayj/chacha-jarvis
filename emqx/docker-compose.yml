@@ -1,0 +1,29 @@
+version: "3.8"
+
+services:
+  emqx:
+    image: emqx/emqx:5.7.1
+    container_name: emqx
+    restart: unless-stopped
+    user: root
+    entrypoint: ["/bin/sh", "/init_emqx.sh"]
+    volumes:
+      - ./init_emqx.sh:/init_emqx.sh
+      - ./certs:/opt/emqx/etc/certs
+      - ./data:/opt/emqx/data
+      - ./log:/opt/emqx/log
+    ports:
+      - "1883:1883"
+      - "8883:8883"
+      - "8083:8083"
+      - "18083:18083"
+    environment:
+      - EMQX_DASHBOARD__DEFAULT_USERNAME=admin
+      - EMQX_DASHBOARD__DEFAULT_PASSWORD=public
+      - EMQX_LOG__LEVEL=info
+    networks:
+      - chacha_net
+
+networks:
+  chacha_net:
+    external: true
