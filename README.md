@@ -24,13 +24,20 @@ chmod +x backend/go_fiber_server/wait-for-it.sh
 
 
 ```
+구동 커맨드
+
 docker compose down --remove-orphans
 docker compose up --build
 ```
 
+
+# go fiber server (robot : 라즈베리py + 날씨 serve용 서버)
+
+[리드미 MQTT + 날씨 연동용 서버 ](./backend/go_fiber_server/README.md) 참조.
+
 # EMQX Mqtt 브로커 도커 설치
 
-[리드미 EMQX](README-EMQX.md) 참조.
+[리드미 EMQX](./emqx/README.md) 참조.
 
 # Plane 스크럼 플래닝 툴 도커 설치
 
