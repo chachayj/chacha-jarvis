@@ -30,6 +30,10 @@ docker compose down --remove-orphans
 docker compose up --build
 ```
 
+background 구동
+
+docker compose up -d
+
 
 # go fiber server (robot : 라즈베리py + 날씨 serve용 서버)
 
@@ -39,9 +43,9 @@ docker compose up --build
 
 [리드미 EMQX](./emqx/README.md) 참조.
 
-# Plane 스크럼 플래닝 툴 도커 설치
+# Plane (스크럼 플래닝 툴 : 개발 계획 도구) 사용
 
-[리드미 Plane](README-Plane.md) 참조.
+[리드미 Plane](./plane-selfhost/README.md) 참조.
 
 # postgresql DB 도커 설치
 
