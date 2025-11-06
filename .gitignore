@@ -48,7 +48,7 @@ build/
 *.bak
 *.tmp
 *.pid
-*.gz
+# *.gz
 *.tar
 *.zip
 *.rar
