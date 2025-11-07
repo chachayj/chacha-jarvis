@@ -17,77 +17,36 @@ services:
       file: ./backend/go_fiber_server/docker-compose.yml
       service: fiber-server
 
-  # =====================================================
-  # 📦 Focalboard DB (PostgreSQL)
-  # =====================================================
-  postgres:
-    image: postgres:15
-    container_name: plane_postgres
-    restart: always
+  ollama:
+    image: ollama/ollama:latest
+    container_name: ollama
+    ports: ["11434:11434"]
+    volumes: [ "ollama:/root/.ollama" ]
+    restart: unless-stopped
+
+  voice-assistant:
+    build:
+      context: ./voice-assistant
+    container_name: voice-assistant
     environment:
-      POSTGRES_USER: plane
-      POSTGRES_PASSWORD: plane
-      POSTGRES_DB: plane
+      - OLLAMA_URL=http://ollama:11434
+      - TTS_VOICE_PATH=/app/models/ko-KR.onnx
+      - TTS_VOICE_JSON=/app/models/ko-KR.onnx.json
+      - TZ=Asia/Seoul
+      - WHISPER_MODEL=small
+      - WHISPER_DEVICE=cpu
+      - WHISPER_COMPUTE=int8
+    ports: ["8080:8080"]
     volumes:
-      - plane_pg_data:/var/lib/postgresql/data
-    ports:
-      - "5432:5432"
-
-  redis:
-    image: redis:7
-    container_name: plane_redis
-    restart: always
-    ports:
-      - "6379:6379"
-
-  backend:
-    image: ghcr.io/makeplane/plane-backend:latest
-    container_name: plane_backend
+      - ./data/tts:/app/data/tts
+      # 개발 편의로 로컬 수정 반영하려면 아래 주석 해제
+      # - ./voice-assistant/static:/app/static:ro
     depends_on:
-      - postgres
-      - redis
-    environment:
-      DATABASE_URL: postgres://plane:plane@postgres:5432/plane
-      REDIS_URL: redis://redis:6379
-      SECRET_KEY: "changeme"
-      DJANGO_SUPERUSER_EMAIL: admin@example.com
-      DJANGO_SUPERUSER_PASSWORD: password
-      DJANGO_SUPERUSER_USERNAME: admin
-    ports:
-      - "8000:8000"
-    command: >
-      sh -c "
-        python manage.py migrate &&
-        python manage.py createsuperuser --noinput || true &&
-        gunicorn plane.wsgi:application --bind 0.0.0.0:8000 --workers 4
-      "
-    restart: always
-
-  worker:
-    image: ghcr.io/makeplane/plane-worker:latest
-    container_name: plane_worker
-    depends_on:
-      - backend
-      - redis
-    environment:
-      DATABASE_URL: postgres://plane:plane@postgres:5432/plane
-      REDIS_URL: redis://redis:6379
-    restart: always
-
-  frontend:
-    image: ghcr.io/makeplane/plane-web:latest
-    container_name: plane_frontend
-    depends_on:
-      - backend
-    ports:
-      - "8080:80"
-    environment:
-      NEXT_PUBLIC_API_BASE_URL: http://localhost:8000/api/
-    restart: always
+      - ollama
+    restart: unless-stopped
 
 volumes:
-  plane_pg_data:
-
+  ollama:
 
 networks:
   chacha_net:

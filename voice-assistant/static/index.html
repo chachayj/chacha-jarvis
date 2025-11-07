@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Korean Voice Assistant</title>
+<style>
+body{font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;padding:16px}
+button{padding:12px 16px;border-radius:10px;border:1px solid #ddd}
+.log{white-space:pre-wrap;background:#fafafa;border:1px solid #eee;padding:10px;border-radius:10px;margin-top:10px}
+.notice{padding:10px;border-radius:10px;background:#fff8e6;border:1px solid #ffecb3;margin-bottom:10px}
+</style></head><body>
+<h2>한국어 음성 비서 데모</h2>
+<div class="notice" id="notice"></div>
+<p>예: "전진", "후진", "불켜", "불꺼", "오늘 날씨", "지금 날씨"</p>
+<button id="rec" disabled>🎙️ 3초 녹음</button>
+<div class="log" id="log"></div>
+<audio id="player" controls style="margin-top:10px;width:100%"></audio>
+<script>
+(function(){
+  const log = (m) => { const el = document.getElementById('log'); if (el) el.textContent += m + '\n'; };
+
+  const init = () => {
+    const btn = document.getElementById('rec');
+    const player = document.getElementById('player');
+    const notice = document.getElementById('notice');
+    if (!btn) { log('❌ 버튼 요소(#rec)를 찾지 못했습니다.'); return; }
+
+    if (location.protocol !== 'https:' && location.hostname !== 'localhost') {
+      notice.textContent = '⚠️ 모바일/사설 IP에서 HTTP로 접속하면 브라우저가 마이크를 차단할 수 있습니다. 가능하면 PC에서 http://localhost:8080 으로 테스트하거나, HTTPS를 사용하세요.';
+    } else {
+      notice.textContent = '✅ 마이크 권한 요청이 가능합니다. 버튼을 눌러 녹음해 보세요.';
+    }
+
+    if (!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia)) {
+      btn.disabled = true;
+      log('❌ 이 브라우저는 getUserMedia를 지원하지 않습니다.');
+      return;
+    }
+    btn.disabled = false;
+
+    btn.onclick = async () => {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        const rec = new MediaRecorder(stream, { mimeType: 'audio/webm' });
+        const chunks = [];
+        rec.ondataavailable = (e) => { if (e.data && e.data.size) chunks.push(e.data); };
+        rec.onstop = async () => {
+          try {
+            const blob = new Blob(chunks, { type: 'audio/webm' });
+            const fd = new FormData(); fd.append('audio', blob, 'korean.webm');
+
+            const sttRes = await fetch('/stt', { method:'POST', body: fd });
+            if (!sttRes.ok) throw new Error('STT HTTP ' + sttRes.status);
+            const stt = await sttRes.json();
+            log('STT: ' + (stt.text || ''));
+
+            const nluRes = await fetch('/nlu', {
+              method:'POST', headers:{'Content-Type':'application/json'},
+              body: JSON.stringify({ text: stt.text || '' })
+            });
+            if (!nluRes.ok) throw new Error('NLU HTTP ' + nluRes.status);
+            const nlu = await nluRes.json();
+            log('NLU: ' + JSON.stringify(nlu));
+
+            const actRes = await fetch('/action', {
+              method:'POST', headers:{'Content-Type':'application/json'},
+              body: JSON.stringify(nlu)
+            });
+            if (!actRes.ok) throw new Error('ACTION HTTP ' + actRes.status);
+            const act = await actRes.json();
+            log('ACTION: ' + JSON.stringify(act.result));
+
+            if (act.say) {
+              const tRes = await fetch('/tts?text=' + encodeURIComponent(act.say));
+              if (!tRes.ok) throw new Error('TTS HTTP ' + tRes.status);
+              const t = await tRes.json();
+              if (t.ok && t.url) {
+                player.src = t.url;
+                await player.play();
+                log('TTS: ' + t.url);
+              } else {
+                log('TTS 오류: ' + JSON.stringify(t));
+              }
+            }
+          } catch (err) {
+            log('❌ 처리 실패: ' + err.message);
+          }
+        };
+        rec.start();
+        setTimeout(() => { try { rec.stop(); } catch(e){} }, 3000);
+      } catch (e) {
+        log('❌ 마이크 요청 실패: ' + e.message);
+        if (e.name === 'NotAllowedError') {
+          log('마이크 권한을 허용했는지 확인하세요.');
+        }
+      }
+    };
+  };
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+</script></body></html>

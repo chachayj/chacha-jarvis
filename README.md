@@ -35,6 +35,14 @@ background 구동
 docker compose up -d
 
 
+# 올라마 + 보이스어시스턴트 구동 
+docker compose up -d ollama
+docker exec -it ollama ollama pull llama3.1:8b
+docker compose up -d --build
+# http://localhost:8080
+
+
+
 # go fiber server (robot : 라즈베리py + 날씨 serve용 서버)
 
 [리드미 MQTT + 날씨 연동용 서버 ](./backend/go_fiber_server/README.md) 참조.
