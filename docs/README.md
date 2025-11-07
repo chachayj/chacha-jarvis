@@ -4,7 +4,6 @@
 
 ## Chatbot + robot server (Mqtt)
 
-<video src="../voice-assistant/chatbot-work-result.mp4" controls width="640"></video>
+<video src="chatbot-work-result.mp4" controls width="640"></video>
 
-[🎥 Chatbot 시연 영상 열기](https://github.com/chachayj/chacha-jarvis/blame/dev/voice-assistant/chatbot-work-result.mp4)
 
