@@ -52,3 +52,5 @@ netsh interface portproxy add v4tov4 listenport=8443 listenaddress=0.0.0.0 conne
 
 
 <video src="chatbot-work-result.mp4" controls width="640"></video>
+
+[🎥 시연 영상 열기](https://chachayj.github.io/chacha-jarvis/)

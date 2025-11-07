@@ -41,6 +41,9 @@ docker compose up -d
 
 <video src="./voice-assistant/chatbot-work-result.mp4" controls width="640"></video>
 
+[🎥 시연 영상 열기](https://chachayj.github.io/chacha-jarvis/)
+
+
 # Chatbot (올라마 + 보이스어시스턴트)
 
 [리드미 Chatbot](./voice-assistant/README.md) 참조.
