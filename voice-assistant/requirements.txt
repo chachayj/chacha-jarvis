@@ -7,3 +7,4 @@ python-multipart==0.0.9
 piper-tts==1.2.0
 huggingface_hub==0.25.2
 hf-transfer==0.1.8
+gTTS==2.5.1

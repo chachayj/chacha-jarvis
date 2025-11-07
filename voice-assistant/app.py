@@ -4,6 +4,7 @@ from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 import requests
+from gtts import gTTS
 
 OLLAMA_URL = os.getenv("OLLAMA_URL", "http://localhost:11434")
 LLM_MODEL  = os.getenv("LLM_MODEL", "llama3.1:8b")
@@ -13,6 +14,7 @@ TTS_VOICE_JSON = os.getenv("TTS_VOICE_JSON", "/app/models/ko-KR.onnx.json")
 WHISPER_MODEL = os.getenv("WHISPER_MODEL", "small")
 WHISPER_DEVICE = os.getenv("WHISPER_DEVICE", "cpu")
 WHISPER_COMPUTE = os.getenv("WHISPER_COMPUTE", "int8")
+AUDIO_DIR = "/app/data/tts"
 
 app = FastAPI(title="Korean Voice Assistant")
 app.mount("/static", StaticFiles(directory="static"), name="static")
@@ -91,8 +93,11 @@ def nlu_endpoint(req: NLURequest):
 
 발화: "{req.text}"
 """
-    r = requests.post(f"{OLLAMA_URL}/voice-assistant/generate", json={
-        "model": LLM_MODEL, "format": "json", "prompt": prompt
+    r = requests.post(f"{OLLAMA_URL}/api/generate", json={
+        "model": LLM_MODEL,
+        "format": "json",
+        "prompt": prompt,
+        "stream": False  # ✅ 추가
     }, timeout=120)
     r.raise_for_status()
     out = r.json().get("response", "")
@@ -135,14 +140,14 @@ def action_endpoint(req: ActionRequest):
 
 @app.get("/tts")
 def tts_endpoint(text: str = Query(..., min_length=1, max_length=500)):
-    if not tts_voice:
-        return JSONResponse(status_code=503, content={"ok": False, "message": "TTS 보이스가 준비되지 않았습니다."})
-    os.makedirs(AUDIO_DIR, exist_ok=True)
-    outfile = os.path.join(AUDIO_DIR, f"{uuid.uuid4().hex}.wav")
-    with open(outfile, "wb") as f:
-        for audio_bytes in tts_voice.synthesize_stream_raw(text):
-            f.write(audio_bytes)
-    return {"ok": True, "url": f"/audio/{os.path.basename(outfile)}"}
+    try:
+        os.makedirs(AUDIO_DIR, exist_ok=True)
+        outfile = os.path.join(AUDIO_DIR, f"{uuid.uuid4().hex}.mp3")
+        tts = gTTS(text=text, lang="ko")
+        tts.save(outfile)
+        return {"ok": True, "url": f"/chatbot/audio/{os.path.basename(outfile)}"}
+    except Exception as e:
+        return JSONResponse(status_code=500, content={"ok": False, "message": str(e)})
 
 @app.get("/audio/{fname}")
 def get_audio(fname: str):
