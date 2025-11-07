@@ -24,26 +24,28 @@ chmod +x backend/go_fiber_server/wait-for-it.sh
 
 
 ```
-구동 커맨드
+# 구동 커맨드
 
 docker compose down --remove-orphans
 docker compose up --build
 ```
 
-background 구동
-
+# background 구동
+```
 docker compose up -d
+```
 
+# 구동 및 실행 예시 영상 참조. (robot server 연동 예정)
 
-# 올라마 + 보이스어시스턴트 구동 
-docker compose up -d ollama
-docker exec -it ollama ollama pull llama3.1:8b
-docker compose up -d --build
-# http://localhost:8080
+## Chatbot + robot server (Mqtt)
 
+<video src="./voice-assistant/chatbot-work-result.mp4" controls width="640"></video>
 
+# Chatbot (올라마 + 보이스어시스턴트)
 
-# go fiber server (robot : 라즈베리py + 날씨 serve용 서버)
+[리드미 Chatbot](./voice-assistant/README.md) 참조.
+
+# Robot server (go fiber server : 라즈베리py + 날씨 serve용 서버)
 
 [리드미 MQTT + 날씨 연동용 서버 ](./backend/go_fiber_server/README.md) 참조.
 

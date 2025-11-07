@@ -18,7 +18,7 @@ services:
       service: fiber-server
 
   ollama:
-    image: ollama/ollama:latest
+    image: ollama/ollama:0.12.10
     container_name: ollama
     ports: ["11434:11434"]
     volumes: [ "ollama:/root/.ollama" ]
@@ -43,6 +43,19 @@ services:
       # - ./voice-assistant/static:/app/static:ro
     depends_on:
       - ollama
+    restart: unless-stopped
+
+  nginx:
+    image: nginx:1.27.2
+    container_name: chatbot-proxy
+    depends_on:
+      - voice-assistant
+    ports:
+      - "8443:443"   # 🔄 변경! 호스트는 8443, 컨테이너는 443
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro
+      - ./nginx/selfsigned.crt:/etc/nginx/selfsigned.crt:ro
+      - ./nginx/selfsigned.key:/etc/nginx/selfsigned.key:ro
     restart: unless-stopped
 
 volumes:
