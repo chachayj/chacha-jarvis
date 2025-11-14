@@ -35,6 +35,14 @@ docker compose up --build
 docker compose up -d
 ```
 
+# 접속 url
+
+- 3D map front (vue3 + cesium) : http://localhost:5173/
+- chatbot : https://localhost:8443/chatbot/
+- robot server : http://localhost:3000/
+- emqx dashboard : http://localhost:18083
+- plane (개별구동) : http://localhost
+
 # 구동 및 실행 예시 영상 참조. (robot server 연동 예정)
 
 ## Chatbot + robot server (Mqtt)

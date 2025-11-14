@@ -1,25 +1,35 @@
-# vue
+# vue3 프론트엔드 
 
-This template should help get you started developing with Vue 3 in Vite.
 
-## Recommended IDE Setup
+# 최초 세팅
+```
+npm install -g create-vue@3.8.0
 
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur) + [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=Vue.vscode-typescript-vue-plugin).
+create-vue vue
 
-## Type Support for `.vue` Imports in TS
+- 실행 예시 및 세팅
 
-TypeScript cannot handle type information for `.vue` imports by default, so we replace the `tsc` CLI with `vue-tsc` for type checking. In editors, we need [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=Vue.vscode-typescript-vue-plugin) to make the TypeScript language service aware of `.vue` types.
+Vue.js - The Progressive JavaScript Framework
 
-If the standalone TypeScript plugin doesn't feel fast enough to you, Volar has also implemented a [Take Over Mode](https://github.com/johnsoncodehk/volar/discussions/471#discussioncomment-1361669) that is more performant. You can enable it by the following steps:
+✔ Add TypeScript? … No / Yes
+✔ Add JSX Support? … No / Yes
+✔ Add Vue Router for Single Page Application development? … No / Yes
+✔ Add Pinia for state management? … No / Yes
+✔ Add Vitest for Unit Testing? … No / Yes
+✔ Add an End-to-End Testing Solution? › Cypress
+✔ Add ESLint for code quality? … No / Yes
+✔ Add Prettier for code formatting? … No / Yes
 
-1. Disable the built-in TypeScript Extension
-    1) Run `Extensions: Show Built-in Extensions` from VSCode's command palette
-    2) Find `TypeScript and JavaScript Language Features`, right click and select `Disable (Workspace)`
-2. Reload the VSCode window by running `Developer: Reload Window` from the command palette.
+Scaffolding project in /root/chacha-jarvis/frontend/web/vue...
 
-## Customize configuration
+Done. Now run:
 
-See [Vite Configuration Reference](https://vitejs.dev/config/).
+  cd vue
+  npm install
+  npm run format
+  npm run dev
+
+```
 
 ## Project Setup
 
@@ -51,18 +61,19 @@ npm run test:unit
 npm run test:e2e:dev
 ```
 
-This runs the end-to-end tests against the Vite development server.
-It is much faster than the production build.
-
-But it's still recommended to test the production build with `test:e2e` before deploying (e.g. in CI environments):
-
-```sh
-npm run build
-npm run test:e2e
-```
 
 ### Lint with [ESLint](https://eslint.org/)
 
 ```sh
 npm run lint
 ```
+
+
+# libs
+```
+cesium 설치를 위해 기존 vite 호환성 맞추기.
+
+npm uninstall vite-plugin-cesium
+npm install vite-plugin-cesium@1.2.23 --save-dev --legacy-peer-deps
+
+
