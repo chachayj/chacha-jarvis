@@ -2,6 +2,19 @@
 
 3D (cesium) 베이스의 한국 맵 + chatbot을 활용하여 "어느지역 오늘 날씨" 발화 입력시 해당 위치로 이동하며 날씨를 report 하는 웹앱
 
+# node js 버전
+v20.18.0
+
+# 실행
+
+npm run dev
+
+# 접속 url
+http://localhost:5173/
+
+# 포트 포워딩 wsl용
+netsh interface portproxy add v4tov4 listenport=5173 listenaddress=0.0.0.0 connectport=5173 connectaddress=172.20.223.124
+
 
 # 최초 세팅
 ```

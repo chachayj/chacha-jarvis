@@ -37,17 +37,18 @@ docker compose up -d
 
 # 접속 url
 
-- 3D map front (vue3 + cesium) : http://localhost:5173/
-- chatbot : https://localhost:8443/chatbot/
+- 3D map front (vue3 + cesium) : http://localhost:5173/ 혹은 nginx https://localhost:8443/korea3d/
+- chatbot : http://localhost:8080 혹은 nginx https://localhost:8443/chatbot/
 - robot server : http://localhost:3000/
 - emqx dashboard : http://localhost:18083
 - plane (개별구동) : http://localhost
 
+
+
+
 # 구동 및 실행 예시 영상 참조. (robot server 연동 예정)
 
-## Chatbot + robot server (Mqtt)
-
-<video src="./voice-assistant/chatbot-work-result.mp4" controls width="640"></video>
+## 3DMap + Chatbot + robot server (Mqtt)
 
 [🎥 시연 영상 열기](https://chachayj.github.io/chacha-jarvis/)
 
