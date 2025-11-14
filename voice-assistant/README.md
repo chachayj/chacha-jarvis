@@ -10,9 +10,9 @@ FastAPI, Whisper, Ollama + Llama3, gTTS 를 사용하여 구현.
 docker exec -it ollama ollama pull llama3.1:8b
 
 # serve hosts
-https://서버IP:8443/chatbot
+https://서버IP:8443/chatbot/
 
-https://localhost:8443/chatbot
+https://localhost:8443/chatbot/
 
 
 # WSL용 port 오픈
