@@ -2,6 +2,7 @@
   <div id="app-wrapper">
     <AdministrativeSelect @moveTo="handleMoveTo" />
     <ThreeDMap @ready="handleReady" />
+    <ChatbotOverlay :viewer="viewer" />
   </div>
 </template>
 
@@ -10,6 +11,7 @@ import { ref } from "vue";
 import * as Cesium from "cesium";
 import ThreeDMap from "../components/three-d-map/3DMap.vue";
 import AdministrativeSelect from "../components/three-d-map/AdministrativeSelect.vue";
+import ChatbotOverlay from "../components/chatbot/ChatbotOverlay.vue";
 
 const viewer = ref<Cesium.Viewer | null>(null);
 
