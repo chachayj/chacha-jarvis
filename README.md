@@ -28,6 +28,11 @@ chmod +x backend/go_fiber_server/wait-for-it.sh
 
 docker compose down --remove-orphans
 docker compose up --build
+
+(만약 에러가 날경우 Credential Helper 초기화)
+rm ~/.docker/config.json
+docker logout
+docker login
 ```
 
 # background 구동

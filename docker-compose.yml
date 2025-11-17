@@ -50,6 +50,7 @@ services:
       - WHISPER_MODEL=small
       - WHISPER_DEVICE=cpu
       - WHISPER_COMPUTE=int8
+      - FIBER_API_URL=http://fiber-server:3000
     ports:
       - "8080:8080"
     volumes:
