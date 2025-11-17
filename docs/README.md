@@ -4,6 +4,11 @@
 
 ## 3DMap + Chatbot + robot server (Mqtt)
 
+<video src="3d+chatbot+mqtt.mp4" controls width="640"></video>
+
+
+## 3DMap + Chatbot
+
 <video src="3d+chatbot.mp4" controls width="640"></video>
 
 
