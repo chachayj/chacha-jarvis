@@ -1,6 +1,6 @@
 # chacha-jarvis 데모 영상
 
-# 구동 및 실행 예시 영상 참조. (robot server 연동 예정)
+# 구동 및 실행 예시 영상 참조.
 
 ## 3DMap + Chatbot + robot server (Mqtt)
 
