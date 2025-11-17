@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.chacha.mapper.TestMapper">
+
+    <select id="selectOne" resultType="com.chacha.domain.SimpleValue">
+        <!-- SELECT 1 AS value -->
+        SELECT
+            count(*) AS value
+            <!-- administrative.administrative_provinces.country_code,
+            administrative.administrative_provinces.province_code,
+            administrative.administrative_provinces.province_name -->
+        FROM administrative.administrative_provinces
+        WHERE administrative.administrative_provinces.country_code = 'KR'
+        <!-- ORDER BY administrative.administrative_provinces.province_name -->
+    </select>
+
+</mapper>

@@ -55,6 +55,32 @@ services:
     networks:
       - chacha_net
 
+
+  # =====================================================
+  # spring Server (Java 17)
+  # =====================================================
+  spring-server:
+    build:
+      context: ./backend/spring_server
+      dockerfile: Dockerfile
+    container_name: spring-server
+    ports:
+      - "8081:8081"
+    environment:
+      - SPRING_PROFILES_ACTIVE=dev
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_USER=chacha
+      - DB_PASS=chacha123
+      - DB_NAME=chacha_db
+      - TZ=Asia/Seoul
+    depends_on:
+      - postgres
+    restart: unless-stopped
+    networks:
+      - chacha_net
+
+
   # =====================================================
   # Voice Assistant (FastAPI + Whisper + TTS)
   # =====================================================
