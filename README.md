@@ -76,7 +76,7 @@ docker compose up -d
 
 # postgresql DB 도커 설치
 
-[리드미 postgresql](README-postgresql.md) 참조.
+[리드미 postgresql](./postgres/README.md) 참조.
 
 # 프로젝트 구조
 
