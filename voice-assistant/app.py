@@ -6,6 +6,7 @@ from pydantic import BaseModel
 import requests
 from gtts import gTTS
 
+FIBER_API_URL = os.getenv("FIBER_API_URL", "http://fiber-server:3000")
 OLLAMA_URL = os.getenv("OLLAMA_URL", "http://localhost:11434")
 LLM_MODEL  = os.getenv("LLM_MODEL", "llama3.1:8b")
 TTS_VOICE_PATH = os.getenv("TTS_VOICE_PATH", "/app/models/ko-KR.onnx")
@@ -113,6 +114,16 @@ def do_light(power: str):
 def do_weather(timeframe: str):
     return {"ok": True, "timeframe": timeframe, "summary": "맑음, 23°C"}
 
+def do_robot_control(command: str):
+    """Go Fiber 서버에 로봇 제어 명령 POST"""
+    url = f"{FIBER_API_URL}/robots/1/control"
+    try:
+        res = requests.post(url, json={"Command": command}, timeout=10)
+        res.raise_for_status()
+        return {"ok": True, "fiber_response": res.json()}
+    except Exception as e:
+        return {"ok": False, "error": str(e)}
+
 @app.post("/action")
 def action_endpoint(req: ActionRequest):
     intent = (req.intent or "").upper()
@@ -120,15 +131,40 @@ def action_endpoint(req: ActionRequest):
     if intent == "MOVE":
         direction = p.get("direction")
         assert direction in ("forward","backward")
-        result = do_move(direction)
-        say = "전진합니다." if direction=="forward" else "후진합니다."
-        return {"result": result, "say": say}
+        # 🔹 Fiber 서버로 명령 전달
+        cmd = "move forward" if direction == "forward" else "move backward"
+        result = do_robot_control(cmd)
+
+        # 🔹 기존 동작 유지 + Fiber 연동 결과 병합
+        local_result = do_move(direction)
+        say = "전진합니다." if direction == "forward" else "후진합니다."
+
+        return {
+            "result": {
+                "chatbot": local_result,
+                "robot": result
+            },
+            "say": say
+        }
+
     elif intent == "LIGHT":
         power = p.get("power")
         assert power in ("on","off")
-        result = do_light(power)
-        say = "불을 켭니다." if power=="on" else "불을 끕니다."
-        return {"result": result, "say": say}
+        # 🔹 Fiber 서버로 명령 전달
+        cmd = "turn on light" if power == "on" else "turn off light"
+        result = do_robot_control(cmd)
+
+        local_result = do_light(power)
+        say = "불을 켭니다." if power == "on" else "불을 끕니다."
+
+        return {
+            "result": {
+                "chatbot": local_result,
+                "robot": result
+            },
+            "say": say
+        }
+
     elif intent == "WEATHER":
         timeframe = p.get("timeframe", "now")
         assert timeframe in ("today","now")
