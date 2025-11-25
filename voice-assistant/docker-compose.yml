@@ -1,0 +1,31 @@
+version: "3.8"
+
+services:
+  voice-assistant:
+    build:
+      context: .
+    container_name: voice-assistant
+    environment:
+      - OLLAMA_URL=http://ollama:11434
+      - TTS_VOICE_PATH=/app/models/ko-KR.onnx
+      - TTS_VOICE_JSON=/app/models/ko-KR.onnx.json
+      - TZ=Asia/Seoul
+      - WHISPER_MODEL=small
+      - WHISPER_DEVICE=cpu
+      - WHISPER_COMPUTE=int8
+      - FIBER_API_URL=http://fiber-server:3000
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./data/tts:/app/data/tts
+      # 개발 편의용: 정적파일 수정 반영시
+      # - ./voice-assistant/static:/app/static:ro
+    depends_on:
+      - ollama
+    restart: unless-stopped
+    networks:
+      - chacha_net
+
+networks:
+  chacha_net:
+    external: true

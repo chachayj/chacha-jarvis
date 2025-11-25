@@ -1,0 +1,22 @@
+version: "3.8"
+
+services:
+  nginx:
+    image: nginx:1.27.2
+    container_name: chatbot-proxy
+    depends_on:
+      - voice-assistant
+      - vue-frontend
+    ports:
+      - "8443:443"
+    volumes:
+      - ./conf.d:/etc/nginx/conf.d:ro
+      - ./selfsigned.crt:/etc/nginx/selfsigned.crt:ro
+      - ./selfsigned.key:/etc/nginx/selfsigned.key:ro
+    restart: unless-stopped
+    networks:
+      - chacha_net
+
+networks:
+  chacha_net:
+    external: true

@@ -1,0 +1,17 @@
+version: "3.8"
+
+services:
+  ollama:
+    image: ollama/ollama:0.12.10
+    container_name: ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama:/root/.ollama
+    restart: unless-stopped
+    networks:
+      - chacha_net
+
+networks:
+  chacha_net:
+    external: true

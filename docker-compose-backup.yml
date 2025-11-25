@@ -1,0 +1,160 @@
+version: "3.8"
+
+services:
+  # =====================================================
+  # EMQX MQTT Broker
+  # =====================================================
+  emqx:
+    extends:
+      file: ./emqx/docker-compose.yml
+      service: emqx
+    networks:
+      - chacha_net
+
+  # =====================================================
+  # Fiber Server (Go)
+  # =====================================================
+  fiber-server:
+    extends:
+      file: ./backend/go_fiber_server/docker-compose.yml
+      service: fiber-server
+    networks:
+      - chacha_net
+
+  # =====================================================
+  # Ollama (LLM Model)
+  # =====================================================
+  ollama:
+    image: ollama/ollama:0.12.10
+    container_name: ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama:/root/.ollama
+    restart: unless-stopped
+    networks:
+      - chacha_net
+
+  # =====================================================
+  # PostgreSQL (Safe Persistent DB)
+  # =====================================================
+  postgres:
+    image: postgis/postgis:16-3.4
+    container_name: chacha-postgres
+    ports:
+      - "5434:5432"
+    environment:
+      POSTGRES_USER: chacha
+      POSTGRES_PASSWORD: chacha123
+      POSTGRES_DB: chacha_db
+      TZ: Asia/Seoul
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./postgres/initdb:/docker-entrypoint-initdb.d
+    restart: unless-stopped
+    networks:
+      - chacha_net
+
+
+  # =====================================================
+  # spring Server (Java 17)
+  # =====================================================
+  spring-server:
+    build:
+      context: ./backend/spring_server
+      dockerfile: Dockerfile
+    container_name: spring-server
+    ports:
+      - "8081:8081"
+    environment:
+      - SPRING_PROFILES_ACTIVE=dev
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_USER=chacha
+      - DB_PASS=chacha123
+      - DB_NAME=chacha_db
+      - TZ=Asia/Seoul
+    depends_on:
+      - postgres
+    restart: unless-stopped
+    networks:
+      - chacha_net
+
+
+  # =====================================================
+  # Voice Assistant (FastAPI + Whisper + TTS)
+  # =====================================================
+  voice-assistant:
+    build:
+      context: ./voice-assistant
+    container_name: voice-assistant
+    environment:
+      - OLLAMA_URL=http://ollama:11434
+      - TTS_VOICE_PATH=/app/models/ko-KR.onnx
+      - TTS_VOICE_JSON=/app/models/ko-KR.onnx.json
+      - TZ=Asia/Seoul
+      - WHISPER_MODEL=small
+      - WHISPER_DEVICE=cpu
+      - WHISPER_COMPUTE=int8
+      - FIBER_API_URL=http://fiber-server:3000
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./data/tts:/app/data/tts
+      # 개발 편의용: 정적파일 수정 반영시
+      # - ./voice-assistant/static:/app/static:ro
+    depends_on:
+      - ollama
+    restart: unless-stopped
+    networks:
+      - chacha_net
+
+  # =====================================================
+  # Vue3 + Cesium Frontend (Vite Dev Server)
+  # =====================================================
+  vue-frontend:
+    build:
+      context: ./frontend/web/vue
+      dockerfile: Dockerfile
+    container_name: vue-frontend
+    ports:
+      - "5173:5173"
+    environment:
+      - NODE_ENV=development
+      - TZ=Asia/Seoul
+    volumes:
+      - ./frontend/web/vue:/app
+    command: ["npm", "run", "dev"]
+    restart: unless-stopped
+    networks:
+      - chacha_net
+
+  # =====================================================
+  # Nginx HTTPS Proxy
+  # =====================================================
+  nginx:
+    image: nginx:1.27.2
+    container_name: chatbot-proxy
+    depends_on:
+      - voice-assistant
+      - vue-frontend
+    ports:
+      - "8443:443"
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro
+      - ./nginx/selfsigned.crt:/etc/nginx/selfsigned.crt:ro
+      - ./nginx/selfsigned.key:/etc/nginx/selfsigned.key:ro
+    restart: unless-stopped
+    networks:
+      - chacha_net
+
+# =====================================================
+# Shared Volumes & Network
+# =====================================================
+volumes:
+  ollama:
+  postgres-data:
+
+networks:
+  chacha_net:
+    driver: bridge
