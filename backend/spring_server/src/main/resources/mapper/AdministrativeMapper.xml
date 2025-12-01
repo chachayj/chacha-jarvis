@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.chacha.mapper.AdministrativeMapper">
+
+  <!-- 1) 한국의 provinces 조회 -->
+  <select id="selectProvinces"
+          parameterType="AdministrativeProvincesQueryEntity"
+          resultType="ProvinceEntity">
+    SELECT
+        administrative.administrative_provinces.country_code,
+        administrative.administrative_provinces.province_code,
+        administrative.administrative_provinces.province_name
+    FROM administrative.administrative_provinces
+    WHERE administrative.administrative_provinces.country_code = #{countryCode}
+    ORDER BY administrative.administrative_provinces.province_name
+  </select>
+
+  <!-- 2) 특정 광역시/도의 바운더리 중심점 리스트 (풀필드, limit/offset 선택) -->
+  <select id="selectCentersByProvince"
+          parameterType="ProvinceCentersQueryEntity"
+          resultType="BoundaryCenterEntity">
+    SELECT
+        administrative.administrative_boundaries_by_province.province_code,
+        administrative.administrative_boundaries_by_province.id,
+        administrative.administrative_boundaries_by_province.osm_id,
+        administrative.administrative_boundaries_by_province.name,
+        administrative.administrative_boundaries_by_province.name_en,
+        administrative.administrative_boundaries_by_province.boundary,
+        administrative.administrative_boundaries_by_province.admin_level,
+        administrative.administrative_boundaries_by_province.country_code,
+        <!-- administrative.administrative_boundaries_by_province.admin_centre_node_id,
+        administrative.administrative_boundaries_by_province.admin_centre_node_lat,
+        administrative.administrative_boundaries_by_province.admin_centre_node_lng, -->
+        administrative.administrative_boundaries_by_province.label_node_id,
+        administrative.administrative_boundaries_by_province.label_node_lat,
+        administrative.administrative_boundaries_by_province.label_node_lng,
+        administrative.administrative_boundary_centers_by_province.longitude,
+        administrative.administrative_boundary_centers_by_province.latitude
+    FROM administrative.administrative_boundaries_by_province
+    JOIN administrative.administrative_boundary_centers_by_province
+      ON administrative.administrative_boundary_centers_by_province.province_code = administrative.administrative_boundaries_by_province.province_code
+     AND administrative.administrative_boundary_centers_by_province.osm_id = administrative.administrative_boundaries_by_province.osm_id
+    WHERE administrative.administrative_boundaries_by_province.province_code = #{provinceCode}
+    ORDER BY administrative.administrative_boundaries_by_province.name
+    <!-- <if test="limit != null">  LIMIT #{limit}  </if>
+    <if test="offset != null"> OFFSET #{offset} </if> -->
+  </select>
+
+  <!-- 3) 총 개수 -->
+  <select id="countCentersByProvince"
+          parameterType="ProvinceCentersQueryEntity"
+          resultType="int">
+    SELECT COUNT(*)
+    FROM administrative.administrative_boundaries_by_province
+    WHERE administrative.administrative_boundaries_by_province.province_code = #{provinceCode}
+  </select>
+
+
+
+  <!-- <sql id="BaseSelect">
+    SELECT
+      province_code   AS provinceCode,
+      province_name   AS provinceName,
+      country_code    AS countryCode,
+      district_code   AS districtCode,
+      name,
+      name_en         AS nameEn,
+      admin_level     AS adminLevel,
+      osm_id          AS osmId,
+      center_lat      AS centerLat,
+      center_lng      AS centerLng
+    FROM administrative.administrative_districts
+    WHERE province_code = #{provinceCode}
+    <if test="q != null and q != ''">
+      AND (name ILIKE CONCAT('%', #{q}, '%')
+        OR name_en ILIKE CONCAT('%', #{q}, '%'))
+    </if>
+  </sql>
+
+  <select id="countDistricts"
+          parameterType="AdministrativeDistrictsQueryEntity"
+          resultType="long">
+    SELECT COUNT(*) FROM (
+      <include refid="BaseSelect"/>
+    ) t
+  </select>
+
+  <select id="selectDistricts"
+          parameterType="AdministrativeDistrictsQueryEntity"
+          resultType="AdministrativeDistrictEntity">
+    <include refid="BaseSelect"/>
+    ORDER BY
+      <choose>
+        <when test="sortBy == 'nameEn'"> name_en </when>
+        <when test="sortBy == 'adminLevel'"> admin_level </when>
+        <when test="sortBy == 'districtCode'"> district_code </when>
+        <otherwise> name </otherwise>
+      </choose>
+      <choose>
+        <when test="sortDir != null and sortDir.toLowerCase() == 'desc'"> DESC </when>
+        <otherwise> ASC </otherwise>
+      </choose>
+    LIMIT #{limit} OFFSET #{offset}
+  </select> -->
+
+  <!-- 총 건수 -->
+  <select id="countDistricts"
+          parameterType="AdministrativeDistrictsQueryEntity"
+          resultType="long">
+    SELECT COUNT(*)
+    FROM administrative.administrative_districts
+    WHERE province_code = #{provinceCode}
+  </select>
+
+  <!-- 목록 조회 (정렬/검색/페이징 없음) -->
+  <select id="selectDistricts"
+          parameterType="AdministrativeDistrictsQueryEntity"
+          resultType="AdministrativeDistrictEntity">
+    SELECT
+      province_code  AS provinceCode,
+      province_name  AS provinceName,
+      country_code   AS countryCode,
+      district_code  AS districtCode,
+      name,
+      name_en        AS nameEn,
+      admin_level    AS adminLevel,
+      osm_id         AS osmId
+      <!-- center_lat     AS centerLat,
+      center_lng     AS centerLng -->
+    FROM administrative.administrative_districts
+    WHERE province_code = #{provinceCode}
+    ORDER BY name ASC
+  </select>
+
+  <!-- districtCode: KR-SEOUL-SEOCHOGU
+       provinceCode: KR-SEOUL (파티션 프루닝용 상수) -->
+  <sql id="WithParam">
+    WITH p AS (
+      SELECT
+        #{districtCode}::text AS district_code,
+        (split_part(#{districtCode}, '-', 1) || '-' || split_part(#{districtCode}, '-', 2))::text AS province_code
+    )
+  </sql>
+
+  <select id="countCentersByDistrict"
+          parameterType="AdministrativeDistrictCentersQueryEntity"
+          resultType="long">
+    <include refid="WithParam"/>
+    SELECT COUNT(*)
+    FROM p
+    JOIN administrative.administrative_boundaries_by_province b
+      ON b.province_code = p.province_code
+    JOIN administrative.administrative_boundary_centers_by_province c
+      ON c.province_code = b.province_code
+     AND c.osm_id       = b.osm_id
+    WHERE b.district_code = p.district_code
+      AND b.admin_level   = 8
+  </select>
+
+  <select id="selectCentersByDistrict"
+          parameterType="AdministrativeDistrictCentersQueryEntity"
+          resultType="BoundaryCenterEntity">
+    <include refid="WithParam"/>
+    SELECT
+      b.province_code AS provinceCode,
+      b.id            AS id,
+      b.osm_id        AS osmId,
+      b.name          AS name,
+      b.name_en       AS nameEn,
+      b.boundary      AS boundary,
+      b.admin_level   AS adminLevel,
+      b.country_code  AS countryCode,
+      c.longitude     AS longitude,
+      c.latitude      AS latitude
+    FROM p
+    JOIN administrative.administrative_boundaries_by_province b
+      ON b.province_code = p.province_code
+    JOIN administrative.administrative_boundary_centers_by_province c
+      ON c.province_code = b.province_code
+     AND c.osm_id       = b.osm_id
+    WHERE b.district_code = p.district_code
+      AND b.admin_level   = 8
+    ORDER BY b.name ASC
+    <!-- LIMIT COALESCE(#{limit}, 100)
+    OFFSET COALESCE(#{offset}, 0) -->
+  </select>
+</mapper>

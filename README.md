@@ -48,6 +48,12 @@ docker compose up -d
 - emqx dashboard : http://localhost:18083
 - plane (개별구동) : http://localhost
 
+Swagger UI URL
+http://localhost:8081/swagger-ui/index.html
+
+OpenAPI JSON
+
+http://localhost:8081/v3/api-docs
 
 
 

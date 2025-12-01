@@ -1,0 +1,27 @@
+version: "3.8"
+
+services:
+  spring-server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: spring-server
+    ports:
+      - "8081:8081"
+    environment:
+      - SPRING_PROFILES_ACTIVE=dev
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_USER=chacha
+      - DB_PASS=chacha123
+      - DB_NAME=chacha_db
+      - TZ=Asia/Seoul
+    depends_on:
+      - postgres
+    restart: unless-stopped
+    networks:
+      - chacha_net
+
+networks:
+  chacha_net:
+    external: true
