@@ -1,0 +1,32 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(docker compose *)",
+      "Bash(docker-compose *)",
+      "Bash(docker exec *)",
+      "Bash(docker logs *)",
+      "Bash(docker ps *)",
+      "Bash(docker volume ls *)",
+      "Bash(docker cp *)",
+      "Bash(rsync *)",
+      "Bash(tar *)",
+      "Bash(git status)",
+      "Bash(git diff *)",
+      "Bash(git log *)",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(git check-ignore *)",
+      "Bash(echo \"\\(exit $?\\)\")",
+      "Bash(echo \"\\(mcp ignored? exit $?\\)\")",
+      "mcp__plane__project",
+      "Bash(chmod +x shell-scripts/check_plane_access.sh)",
+      "Bash(bash -n shell-scripts/check_plane_access.sh)",
+      "Bash(bash shell-scripts/check_plane_access.sh --help)",
+      "Bash(command -v pwsh)",
+      "Bash(bash shell-scripts/check_plane_access.sh --lan-only)",
+      "Bash(echo \"\\(exit=$?\\)\")",
+      "Bash(grep -c \"^\\\\.mcp\\\\.json$\")",
+      "Bash(git reset *)"
+    ]
+  }
+}
