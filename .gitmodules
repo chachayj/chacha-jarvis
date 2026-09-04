@@ -1,3 +1,0 @@
-[submodule "plane-selfhost/plane-src"]
-	path = plane-selfhost/plane-src
-	url = https://github.com/chachayj/plane-selfhost-src.git
