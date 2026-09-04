@@ -44,12 +44,12 @@ services:
   # =====================================================
   # spring Server (Java 17)
   # =====================================================
-  # spring-server:
-  #   extends:
-  #     file: ./backend/spring_server/docker-compose.yml
-  #     service: spring-server
-  #   networks:
-  #     - chacha_net
+  spring-server:
+    extends:
+      file: ./backend/spring_server/docker-compose.yml
+      service: spring-server
+    networks:
+      - chacha_net
 
   # =====================================================
   # Voice Assistant (FastAPI + Whisper + TTS)

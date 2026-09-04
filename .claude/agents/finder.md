@@ -45,7 +45,8 @@ tools:
 
 - **Spring**: Controller `controller/*Controller.java` / MyBatis 인터페이스 `mapper/*Mapper.java` /
   MyBatis XML `resources/mapper/*.xml` / DTO `domain/*.java`
-  (Service·Repository·Entity 계층은 아직 없다 — Controller 가 Mapper 를 직접 주입한다)
+  Service `domain/*Service.java` / 엔티티 `entities/` + `entities/query/` /
+  DTO `dto/` · `request/` · `response/` / 커스텀 애노테이션 `annotation/`
 - **Vue**: route 단위 `views/*View.vue` / 컴포넌트 `components/{도메인}/*.vue` /
   스타일 형제 파일 `components/{도메인}/*.css` / 스토어 `stores/*.ts` / 라우터 `router/index.ts`
 - **DB**: 신규 생성용 `postgres/initdb/` / 정의·덤프 자료 `postgres/schema/`

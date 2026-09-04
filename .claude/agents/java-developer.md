@@ -26,12 +26,13 @@ tools:
 | 프레임워크 | **Spring Boot 3.2.6** (`spring-boot-starter-web`) |
 | 빌드 | **Gradle** (`build.gradle`, Groovy DSL) |
 | 데이터 접근 | **MyBatis** (`mybatis-spring-boot-starter 3.0.3`) |
-| DB | **PostgreSQL** (`postgresql 42.7.3`) |
+| DB | **PostgreSQL** (`postgresql 42.7.3`) + PostGIS |
+| API 문서 | **springdoc-openapi** (`starter-webmvc-ui 2.5.0`) |
+| 보일러플레이트 | **Lombok** (`compileOnly` + `annotationProcessor`) |
 | 포트 | **8081** |
 | 루트 패키지 | `com.chacha` |
 
-> ⚠️ **JPA·QueryDSL·Flyway·Spring Security·MariaDB 는 이 프로젝트에 없다.**
-> 의존성이 딱 셋(`starter-web`, `mybatis`, `postgresql`)뿐인 초기 단계 서버다.
+> ⚠️ **JPA·Hibernate·QueryDSL·Flyway·Spring Security·MariaDB 는 이 프로젝트에 없다.**
 > 없는 기술을 쓰기 전에 `build.gradle` 에 의존성을 추가해야 하고,
 > 그건 아키텍처 결정이므로 사용자에게 먼저 확인한다.
 
@@ -44,9 +45,14 @@ backend/spring_server/
 └── src/main/
     ├── java/com/chacha/
     │   ├── ChachaApplication.java
-    │   ├── controller/     TestController.java
-    │   ├── mapper/         TestMapper.java        (MyBatis 인터페이스)
-    │   └── domain/         SimpleValue.java       (type-aliases-package)
+    │   ├── controller/     TestController, AdministrativeController
+    │   ├── domain/         AdministrativeService, SimpleValue (type-aliases-package)
+    │   ├── mapper/         TestMapper, AdministrativeMapper  (MyBatis 인터페이스)
+    │   ├── entities/       도메인 엔티티 + query/  (조회 전용)
+    │   ├── dto/            내부 전달용
+    │   ├── request/        요청 바디
+    │   ├── response/       응답 바디
+    │   └── annotation/     ColumnSource, EntityInfo, EntityType
     └── resources/
         ├── application.yml
         └── mapper/         TestMapper.xml         (mapper-locations)
@@ -97,8 +103,12 @@ public class TestController {
 ```
 
 - 경로는 `/api/...` 접두어를 쓴다.
-- **Lombok 이 의존성에 없다** — `@Getter`/`@RequiredArgsConstructor` 를 쓰려면 먼저 추가해야 한다.
-- 공통 응답 래퍼(`ApiResponse`)나 전역 예외 핸들러가 아직 없다.
+- **Lombok 이 있다** — 엔티티·DTO 는 `@Getter`/`@Builder` 등을 쓴다.
+  다만 `TestController` 처럼 기존에 손으로 쓴 생성자 주입 코드도 남아 있으니
+  파일마다 기존 스타일을 먼저 확인한다. Entity 에 `@Data` 는 쓰지 않는다.
+- 계층은 `controller → domain(Service) → mapper → XML` 순이다.
+  `AdministrativeController`/`AdministrativeService` 가 그 예다.
+- 공통 응답 래퍼(`ApiResponse`)나 전역 예외 핸들러가 **아직 없다.**
   도입하려면 아키텍처 결정이므로 사용자에게 확인한다.
 
 ## 빌드 명령 (사용자가 실행 — Claude 는 실행하지 않음)

@@ -59,7 +59,7 @@ plan에 명시된 파일들을 메인이 직접 수정:
 - 새 세션 또는 미Read 파일 → Read 1회 → Edit
 
 수정 순서:
-- **Spring**: domain(DTO) → mapper 인터페이스 → mapper XML(`src/main/resources/mapper/`) → controller
+- **Spring**: entities/dto/request/response → mapper 인터페이스 → mapper XML(`src/main/resources/mapper/`) → domain(Service) → controller
 - **Vue**: types → store(Pinia) → composable → component → router
 - **Go**: model → handler → route 등록
 - **DB**: `postgres/initdb/*.sql` 또는 `postgres/schema/**` (Flyway 를 쓰지 않는다 — 컨테이너 초기화 SQL 기반)

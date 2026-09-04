@@ -198,7 +198,7 @@ Step 4에서 식별된 파일들을 `Read`로 직접 확인한다.
 - sub-agent(`java-developer`, `javascript-developer`, `data-engineer`) 호출 금지.
 
 수정 순서:
-- **Spring**: domain(DTO) → mapper 인터페이스 → mapper XML → controller
+- **Spring**: entities/dto/request/response → mapper 인터페이스 → mapper XML → domain(Service) → controller
 - **Vue**: types → store(Pinia) → composable → component → router
 - **Go**: model → handler → route 등록
 
