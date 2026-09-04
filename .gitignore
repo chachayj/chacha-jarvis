@@ -39,10 +39,11 @@ build/
 *.egg-info/
 *.egg
 
-# 환경 변수 파일
-# .env
+# 환경 변수 파일 (.env.example 만 커밋한다)
+.env
 .env.local
 .env.*.local
+!.env.example
 
 # 기타
 *.bak
@@ -61,3 +62,28 @@ build/
 emqx/certs/
 emqx/data/
 emqx/log/
+
+# =====================================================
+# Plane self-host — 시크릿 포함 파일은 추적하지 않는다
+#   설정 예시는 plane-selfhost/plane-app/plane.env.example 를 커밋한다
+# =====================================================
+plane-selfhost/plane-app/plane.env
+plane-selfhost/plane-app/archive/
+plane-selfhost/plane-src/.env
+plane-selfhost/plane-src/data/
+
+# DB 덤프·백업은 절대 커밋하지 않는다 (티켓·계정·이메일·비밀번호 해시 전부 포함)
+*.tar.gz
+*.tgz
+*.dump
+*.sql.gz
+plane-selfhost/plane_pgdata*
+**/pgdata/
+
+# 인증서 개인키
+*.key
+*.pem
+*.p12
+*.pfx
+*.jks
+nginx/selfsigned.key

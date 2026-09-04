@@ -18,8 +18,9 @@ services:
       - "8083:8083"
       - "18083:18083"
     environment:
-      - EMQX_DASHBOARD__DEFAULT_USERNAME=admin
-      - EMQX_DASHBOARD__DEFAULT_PASSWORD=public
+      # 기본값(admin/public)은 EMQX 공식 문서에 공개된 값이다. 반드시 .env 로 덮어쓴다.
+      - EMQX_DASHBOARD__DEFAULT_USERNAME=${EMQX_DASHBOARD_USER:?.env 파일에 EMQX_DASHBOARD_USER 를 설정하세요}
+      - EMQX_DASHBOARD__DEFAULT_PASSWORD=${EMQX_DASHBOARD_PASS:?.env 파일에 EMQX_DASHBOARD_PASS 를 설정하세요}
       - EMQX_LOG__LEVEL=info
     networks:
       - chacha_net
