@@ -16,6 +16,20 @@ root경로의 README-WSL2-INSTALL.md [리드미 WSL2 인스톨](README-WSL2-INST
 
 현재 모든 세팅은 wsl 2, ubuntu 22.04 + 도커로 세팅합니다.
 
+### 1. 환경변수 파일 준비 (필수)
+
+DB 비밀번호 등 자격 증명은 레포에 없습니다. `.env` 를 직접 만들어야 컨테이너가 뜹니다.
+
+```
+cp .env.example .env
+# .env 의 <생성하세요> 자리를 채웁니다
+```
+
+> `.env` 는 `.gitignore` 대상입니다. 값을 커밋하지 마세요.
+> `DB_PASS` 는 postgres 첫 기동 때 DB에 굳으므로, 이미 띄운 뒤 바꾸면 spring-server 가 뜨지 않습니다.
+
+### 2. 스크립트 실행 권한
+
 ```
 emqx certs 인증서 생성용
 chmod +x emqx/init_emqx.sh
@@ -46,7 +60,7 @@ docker compose up -d
 - chatbot : http://localhost:8080 혹은 nginx https://localhost:8443/chatbot/
 - robot server : http://localhost:3000/
 - emqx dashboard : http://localhost:18083
-- plane (개별구동) : http://localhost
+- plane (개별구동) : http://localhost:8082
 
 Swagger UI URL
 http://localhost:8081/swagger-ui/index.html
@@ -76,9 +90,19 @@ http://localhost:8081/v3/api-docs
 
 [리드미 EMQX](./emqx/README.md) 참조.
 
-# Plane (스크럼 플래닝 툴 : 개발 계획 도구) 사용
+# Claude Code + Plane (AI 코딩 에이전트 + 스크럼 티켓 도구)
 
-[리드미 Plane](./plane-selfhost/README.md) 참조.
+이 레포는 **Claude Code** 로 개발하고 **Plane** 으로 티켓을 관리한다.
+티켓 번호 하나가 브랜치 이름과 커밋 메시지까지 꿰는 구조다.
+
+👉 **[Claude Code × Plane 사용 가이드](./docs/claude-plane-guide.md)** 참조.
+
+- Plane 인스턴스 기동 방법 (공식 도커 이미지 `v1.4.2`, `http://localhost:8082`)
+- API 토큰 세팅 (`/plane_user_setup`)
+- `/start_work` 워크플로우와 단계별 동작
+- 브랜치·커밋 네이밍 규약, 자주 밟는 함정
+
+처음 받았다면 가이드의 [최초 1회 세팅](./docs/claude-plane-guide.md#3-최초-1회-세팅) 부터 보면 된다.
 
 # postgresql DB 도커 설치
 
