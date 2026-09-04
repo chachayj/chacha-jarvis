@@ -39,7 +39,7 @@
 `/start_work` 표준 단계:
 ```
 **Step 1: Plane 조회** (이슈 정보 확인)
-**Step 2: 브랜치 생성** (feature/CUSTOM-{번호})
+**Step 2: 브랜치 생성** (feature/{PREFIX}-{번호})
 **Step 3: Plane 상태 변경** (In Progress)
 **Step 4: 파일 탐색** (Glob/Grep)
 **Step 5: 코드 분석** (Read 후 구조 분석)
@@ -49,12 +49,33 @@
 **Step 9: CHANGELOG + 커밋** (done_work)
 ```
 
-브랜치 네이밍 규칙: **반드시 `feature/CUSTOM-{번호}` 형식**. (`CUSTOM-{번호}` 단독 사용 금지)
+브랜치 네이밍 규칙: **반드시 `feature/{PREFIX}-{번호}` 형식**. (`{PREFIX}-{번호}` 단독 사용 금지)
+커밋 메시지는 `[{PREFIX}-{번호}] {type} : {설명}` 형식 (`type` 은 `feat`/`fix`/`chore`).
 
-티켓은 self-host Plane의 `planecustom` 프로젝트(prefix `CUSTOM`)에 있다.
-`.mcp.json`의 Plane MCP는 SaaS(`my-saas-workspace`)를 가리키므로 이 프로젝트가 보이지 않는다.
-**Step 1의 Plane 조회는 self-host REST API로 한다** — `http://192.0.2.10:8080/api/v1/workspaces/my-workspace/projects/<PROJECT_ID>/issues/`,
-토큰은 `~/.config/plane-migrate/selfhost.env`의 `PLANE_SELFHOST_TOKEN`.
+### ⚠️ 프로젝트·prefix 미확정 (2026-09-03 기준)
+
+이 레포의 Plane 인스턴스(`plane-selfhost/plane-app`, 공식 이미지 v1.4.2)는
+**아직 기동/프로젝트 생성이 안 된 상태**다. 기존 커밋 히스토리는 `[CHACH-*]` 형식이므로
+prefix `CHACH` 로 만들면 히스토리와 이어진다.
+
+확정 전에는 Step 1·Step 3 이 동작하지 않는다 — 사용자에게 Plane 프로젝트 생성이
+필요하다고 알리고 지시를 기다린다. 확정되면 이 섹션과 `CLAUDE.md` 의
+"티켓과 브랜치" 섹션을 같이 갱신한다.
+
+### Step 1 의 Plane 조회 방법
+
+self-host 에는 Plane MCP 서버가 없다(SaaS 전용). 이 레포에는 `.mcp.json` 도 없다.
+**REST API 로 조회한다.**
+
+```bash
+set -a; source ~/.config/plane-chacha/selfhost.env; set +a
+curl -s -H "X-API-Key: $PLANE_SELFHOST_TOKEN" \
+  "$PLANE_SELFHOST_URL/api/v1/workspaces/$PLANE_SELFHOST_WORKSPACE/projects/$PLANE_SELFHOST_PROJECT_ID/issues/"
+```
+
+`~/.config/plane-chacha/selfhost.env` 에 `PLANE_SELFHOST_URL`(기본
+`http://localhost:8082`)·`PLANE_SELFHOST_WORKSPACE`·`PLANE_SELFHOST_PROJECT_ID`·
+`PLANE_SELFHOST_TOKEN` 이 있다. 없으면 `/plane_user_setup` 을 안내한다.
 
 ## 개발 워크플로우 커맨드 체계
 
