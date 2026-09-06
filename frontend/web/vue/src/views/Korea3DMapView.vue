@@ -1,8 +1,8 @@
 <template>
   <div id="app-wrapper">
-    <AdministrativeSelect @moveTo="handleMoveTo" />
+    <AdministrativeSelect ref="selectRef" @moveTo="handleMoveTo" />
     <ThreeDMap @ready="handleReady" />
-    <ChatbotOverlay :viewer="viewer" />
+    <ChatbotOverlay :viewer="viewer" @moveTo="handleMoveTo" />
   </div>
 </template>
 
@@ -14,6 +14,7 @@ import AdministrativeSelect from "../components/three-d-map/AdministrativeSelect
 import ChatbotOverlay from "../components/chatbot/ChatbotOverlay.vue";
 
 const viewer = ref<Cesium.Viewer | null>(null);
+const selectRef = ref<InstanceType<typeof AdministrativeSelect> | null>(null);
 
 function handleReady(v: Cesium.Viewer) {
   viewer.value = v;
@@ -37,9 +38,28 @@ function handleReady(v: Cesium.Viewer) {
     .catch(() => console.warn("서울 3D 타일셋 로드 실패"));
 }
 
-function handleMoveTo({ lon, lat }: { lon: number; lat: number }) {
+function handleMoveTo({
+  lon,
+  lat,
+  label,
+  provinceCode,
+  districtCode,
+}: {
+  lon: number;
+  lat: number;
+  label?: string;
+  provinceCode?: string;
+  districtCode?: string;
+}) {
   const v = viewer.value;
   if (!v) return;
+  if (label) console.log(`[지도 이동] ${label} (${lon}, ${lat})`);
+
+  // 챗봇이 이동시킨 경우엔 상단 셀렉트도 그 위치로 맞춘다.
+  // 셀렉트 자신이 발생시킨 이벤트에는 코드가 없어 재귀 갱신이 일어나지 않는다.
+  if (provinceCode && districtCode && label) {
+    selectRef.value?.syncTo({ provinceCode, districtCode, dongName: label });
+  }
   v.camera.flyTo({
     destination: Cesium.Cartesian3.fromDegrees(lon, lat, 2000),
     orientation: {

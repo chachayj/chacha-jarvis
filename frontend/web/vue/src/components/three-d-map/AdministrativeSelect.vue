@@ -120,5 +120,24 @@ function onSelectDong() {
   }
 }
 
-loadSido();
+/**
+ * 외부(챗봇 등)에서 지도를 이동시켰을 때 셀렉트 3개를 그 위치로 맞춘다.
+ * 각 단계의 onChange 가 하위 선택을 초기화하므로 순서대로 await 해야 한다.
+ */
+async function syncTo(target: { provinceCode: string; districtCode: string; dongName: string }) {
+  await sidoReady;
+
+  selected.sido = target.provinceCode;
+  await onChangeSido();          // 구 목록 로드 (+ 하위 선택 초기화)
+
+  selected.gugun = target.districtCode;
+  await onChangeGugun();         // 동 목록 로드 (+ 하위 선택 초기화)
+
+  const hit = dongList.value.find((d) => d.name === target.dongName);
+  if (hit) selected.dong = hit.code;
+}
+
+defineExpose({ syncTo });
+
+const sidoReady = loadSido();
 </script>

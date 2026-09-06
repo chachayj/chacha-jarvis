@@ -25,6 +25,14 @@ export default defineConfig({
         target: process.env.SPRING_API_URL || 'http://localhost:8081',
         changeOrigin: true,
       },
+      // 챗봇 API 는 voice-assistant(:8080) 가 담당한다.
+      // 서버 라우트는 /nlu, /action, /tts, /audio 이고 /chatbot 프리픽스가 없으므로
+      // nginx 와 동일하게 프리픽스를 떼어서 전달한다.
+      '/chatbot': {
+        target: process.env.CHATBOT_API_URL || 'http://localhost:8080',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/chatbot/, ''),
+      },
     },
   },
 })

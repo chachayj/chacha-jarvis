@@ -26,3 +26,6 @@ coverage
 *.njsproj
 *.sln
 *.sw?
+
+# vue-tsc 타입 검사가 남기는 증분 빌드 캐시
+*.tsbuildinfo
