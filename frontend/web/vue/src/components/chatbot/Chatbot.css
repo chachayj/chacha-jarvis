@@ -73,3 +73,47 @@ button[disabled] {
   font-size: 14px;
   color: #555;
 }
+
+/* ── 텍스트 입력 (마이크 없이 사용) ───────────────────────── */
+.text-row {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+}
+.text-row input {
+  flex: 1;
+  min-width: 0;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid #ddd;
+  font-size: 14px;
+  font-family: inherit;
+}
+.text-row input:focus {
+  outline: 2px solid #007bff;
+  outline-offset: -1px;
+}
+.text-row input:disabled {
+  opacity: 0.6;
+}
+.presets {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-top: 8px;
+}
+.presets button {
+  padding: 6px 11px;
+  font-size: 12px;
+  border-radius: 16px;
+  border: 1px solid #ddd;
+  background: #f5f7fa;
+  cursor: pointer;
+}
+.presets button:hover:not(:disabled) {
+  background: #e9eef5;
+}
+.presets button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

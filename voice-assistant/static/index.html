@@ -4,7 +4,7 @@
 <title>Korean Voice Assistant</title>
 <style>
 body{font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;padding:16px}
-button{padding:12px 16px;border-radius:10px;border:1px solid #ddd;cursor:pointer;position:relative}
+button{padding:12px 16px;border-radius:10px;border:1px solid #ddd;cursor:pointer;position:relative;background:#fff}
 button[disabled]{opacity:0.6;cursor:not-allowed}
 .spinner{
   border:3px solid #eee;
@@ -19,11 +19,31 @@ button[disabled]{opacity:0.6;cursor:not-allowed}
 .notice{padding:10px;border-radius:10px;background:#fff8e6;border:1px solid #ffecb3;margin-bottom:10px}
 .say{margin-top:10px;padding:10px;border-radius:8px;background:#e7f3ff;border:1px solid #b3d3ff;color:#003366}
 .status{margin-top:10px;padding:8px;border-radius:6px;background:#f0f0f0;font-size:14px;color:#555;}
+/* 텍스트 입력 (마이크 없이 사용) */
+.text-row{display:flex;gap:8px;margin-top:10px}
+.text-row input{
+  flex:1;padding:12px;border-radius:10px;border:1px solid #ddd;
+  font-size:15px;font-family:inherit;min-width:0
+}
+.text-row input:focus{outline:2px solid #007bff;outline-offset:-1px}
+.presets{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.presets button{padding:7px 12px;font-size:13px;border-radius:16px;background:#f5f7fa}
+.presets button:hover{background:#e9eef5}
+.hint{font-size:13px;color:#777;margin-top:6px}
 </style></head><body>
 <h2>한국어 음성 비서 데모</h2>
 <div class="notice" id="notice"></div>
 <p>예: "전진", "후진", "불켜", "불꺼", "오늘 날씨", "지금 날씨"</p>
+
 <button id="rec" disabled>🎙️ 3초 녹음</button>
+
+<!-- ✅ 마이크 없이 쓰는 텍스트 입력 -->
+<div class="text-row">
+  <input id="text-input" type="text" placeholder="명령을 입력하세요 (예: 불 켜줘)" autocomplete="off"/>
+  <button id="send">⌨️ 전송</button>
+</div>
+<div class="presets" id="presets"></div>
+<div class="hint">마이크가 없어도 텍스트로 같은 파이프라인(NLU → Action → TTS)을 실행합니다.</div>
 
 <!-- ✅ 상태 표시 -->
 <div id="status" class="status" style="display:none"></div>
@@ -36,6 +56,9 @@ button[disabled]{opacity:0.6;cursor:not-allowed}
 
 <script>
 (function(){
+  // nginx 뒤(/chatbot/…)와 직접 접속(:8080) 양쪽에서 동작하도록 API 경로를 결정한다.
+  const API = location.pathname.startsWith('/chatbot') ? '/chatbot' : '';
+
   const log = (m) => { const el = document.getElementById('log'); if (el) el.textContent += m + '\n'; };
   const setStatus = (msg, show=true) => {
     const el = document.getElementById('status');
@@ -49,37 +72,133 @@ button[disabled]{opacity:0.6;cursor:not-allowed}
     }
   };
 
+  const PRESETS = ['불 켜줘', '불 꺼줘', '전진', '후진', '오늘 날씨'];
+
   const init = () => {
     const btn = document.getElementById('rec');
     const player = document.getElementById('player');
     const notice = document.getElementById('notice');
     const sayBox = document.getElementById('say-box');
+    const textInput = document.getElementById('text-input');
+    const sendBtn = document.getElementById('send');
+    const presetBox = document.getElementById('presets');
 
     if (!btn) { log('❌ 버튼 요소(#rec)를 찾지 못했습니다.'); return; }
 
-    if (location.protocol !== 'https:' && location.hostname !== 'localhost') {
-      notice.textContent = '⚠️ 모바일/사설 IP에서 HTTP로 접속하면 브라우저가 마이크를 차단할 수 있습니다. 가능하면 PC에서 http://localhost:8080 으로 테스트하거나, HTTPS를 사용하세요.';
-    } else {
-      notice.textContent = '✅ 마이크 권한 요청이 가능합니다. 버튼을 눌러 녹음해 보세요.';
+    /**
+     * 텍스트 한 문장을 NLU → Action → TTS 파이프라인에 태운다.
+     * 음성 경로는 STT 로 텍스트를 얻은 뒤 이 함수를 그대로 재사용한다.
+     */
+    async function runPipeline(text) {
+      if (!text) { log('⚠️ 입력이 비어 있습니다.'); return; }
+
+      log('입력: ' + text);
+      setStatus('🤔 의미 분석(NLU) 중...');
+
+      const nluRes = await fetch(API + '/nlu', {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ text })
+      });
+      if (!nluRes.ok) throw new Error('NLU HTTP ' + nluRes.status);
+      const nlu = await nluRes.json();
+      log('NLU: ' + JSON.stringify(nlu));
+      setStatus('⚙️ 명령 실행(Action) 중...');
+
+      const actRes = await fetch(API + '/action', {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify(nlu)
+      });
+      if (!actRes.ok) throw new Error('ACTION HTTP ' + actRes.status);
+      const act = await actRes.json();
+      log('ACTION: ' + JSON.stringify(act.result));
+
+      if (!act.say) { setStatus('✅ 완료', true); return; }
+
+      sayBox.textContent = '🤖 ' + act.say;
+      sayBox.style.display = 'block';
+      setStatus('🗣️ 음성 응답 생성(TTS) 중...');
+
+      const tRes = await fetch(API + '/tts?text=' + encodeURIComponent(act.say));
+      if (!tRes.ok) throw new Error('TTS HTTP ' + tRes.status);
+      const t = await tRes.json();
+      if (t.ok && t.url) {
+        // 서버는 항상 '/chatbot/audio/...' 를 돌려주지만 실제 라우트는 '/audio/...' 다.
+        // nginx 뒤가 아닐 때(:8080 직접 접속) 프리픽스를 떼어 준다.
+        let audioUrl = t.url;
+        if (!API && audioUrl.startsWith('/chatbot/')) audioUrl = audioUrl.slice('/chatbot'.length);
+        player.src = audioUrl;
+        // 자동재생이 브라우저 정책으로 막혀도 파이프라인 자체는 성공으로 본다
+        try { await player.play(); } catch (e) { log('ℹ️ 자동재생 차단됨 — 재생 버튼을 눌러주세요'); }
+        log('TTS: ' + audioUrl);
+        setStatus('✅ 완료! 음성 재생 중...');
+        player.onended = () => { setStatus('', false); log('✅ 음성 재생 완료'); };
+      } else {
+        log('TTS 오류: ' + JSON.stringify(t));
+        setStatus('❌ 음성 생성 실패');
+      }
     }
 
-    if (!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia)) {
+    // ── 텍스트 입력 경로 ─────────────────────────────────────────
+    async function submitText() {
+      const text = textInput.value.trim();
+      if (!text) return;
+      sendBtn.disabled = true;
+      textInput.disabled = true;
+      try {
+        await runPipeline(text);
+        textInput.value = '';
+      } catch (err) {
+        log('❌ 처리 실패: ' + err.message);
+        setStatus('❌ 오류 발생');
+      } finally {
+        sendBtn.disabled = false;
+        textInput.disabled = false;
+        textInput.focus();
+      }
+    }
+
+    sendBtn.onclick = submitText;
+    textInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && !e.isComposing) { e.preventDefault(); submitText(); }
+    });
+
+    PRESETS.forEach((p) => {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.textContent = p;
+      b.onclick = () => { textInput.value = p; submitText(); };
+      presetBox.appendChild(b);
+    });
+
+    textInput.focus();
+
+    // ── 마이크 경로 ──────────────────────────────────────────────
+    const micSupported = !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
+
+    if (!micSupported) {
       btn.disabled = true;
-      log('❌ 이 브라우저는 getUserMedia를 지원하지 않습니다.');
+      btn.textContent = '🎙️ 마이크 사용 불가';
+      notice.textContent = 'ℹ️ 이 브라우저/환경에서는 마이크를 쓸 수 없습니다. 아래 텍스트 입력을 사용하세요.';
       return;
+    }
+
+    if (location.protocol !== 'https:' && location.hostname !== 'localhost') {
+      notice.textContent = '⚠️ 모바일/사설 IP에서 HTTP로 접속하면 브라우저가 마이크를 차단할 수 있습니다. 마이크가 없다면 아래 텍스트 입력을 사용하세요.';
+    } else {
+      notice.textContent = '✅ 마이크로 녹음하거나, 아래 텍스트 입력창을 사용할 수 있습니다.';
     }
     btn.disabled = false;
 
     btn.onclick = async () => {
+      const originalText = btn.textContent;
+      let spinner = null;
       try {
-        // 🔴 녹음 중 표시
         btn.disabled = true;
-        const originalText = btn.textContent;
-        btn.textContent = "🔴 녹음 중...";
-        const spinner = document.createElement('div');
+        btn.textContent = '🔴 녹음 중...';
+        spinner = document.createElement('div');
         spinner.className = 'spinner';
         btn.appendChild(spinner);
-        setStatus("🎤 사용자 음성 녹음 중...");
+        setStatus('🎤 사용자 음성 녹음 중...');
 
         const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
         const rec = new MediaRecorder(stream, { mimeType: 'audio/webm' });
@@ -88,67 +207,25 @@ button[disabled]{opacity:0.6;cursor:not-allowed}
 
         rec.onstop = async () => {
           try {
-            // 🟢 녹음 완료 → 처리중 스피너 유지 + 상태 업데이트
-            setStatus("🔄 음성 인식(STT) 중...");
+            setStatus('🔄 음성 인식(STT) 중...');
             const blob = new Blob(chunks, { type: 'audio/webm' });
             const fd = new FormData(); fd.append('audio', blob, 'korean.webm');
 
-            const sttRes = await fetch('/chatbot/stt', { method:'POST', body: fd });
+            const sttRes = await fetch(API + '/stt', { method:'POST', body: fd });
             if (!sttRes.ok) throw new Error('STT HTTP ' + sttRes.status);
             const stt = await sttRes.json();
             log('STT: ' + (stt.text || ''));
-            setStatus("🤔 의미 분석(NLU) 중...");
 
-            const nluRes = await fetch('/chatbot/nlu', {
-              method:'POST', headers:{'Content-Type':'application/json'},
-              body: JSON.stringify({ text: stt.text || '' })
-            });
-            if (!nluRes.ok) throw new Error('NLU HTTP ' + nluRes.status);
-            const nlu = await nluRes.json();
-            log('NLU: ' + JSON.stringify(nlu));
-            setStatus("⚙️ 명령 실행(Action) 중...");
-
-            const actRes = await fetch('/chatbot/action', {
-              method:'POST', headers:{'Content-Type':'application/json'},
-              body: JSON.stringify(nlu)
-            });
-            if (!actRes.ok) throw new Error('ACTION HTTP ' + actRes.status);
-            const act = await actRes.json();
-            log('ACTION: ' + JSON.stringify(act.result));
-
-            if (act.say) {
-              sayBox.textContent = '🤖 ' + act.say;
-              sayBox.style.display = 'block';
-              setStatus("🗣️ 음성 응답 생성(TTS) 중...");
-
-              const tRes = await fetch('/chatbot/tts?text=' + encodeURIComponent(act.say));
-              if (!tRes.ok) throw new Error('TTS HTTP ' + tRes.status);
-              const t = await tRes.json();
-              if (t.ok && t.url) {
-                player.src = t.url;
-                await player.play();
-                log('TTS: ' + t.url);
-                setStatus("✅ 완료! 음성 재생 중...");
-                player.onended = () => {
-                  setStatus("", false);
-                  log('✅ 음성 재생 완료');
-                };
-              } else {
-                log('TTS 오류: ' + JSON.stringify(t));
-                setStatus("❌ 음성 생성 실패");
-              }
-            }
-
-            // 버튼 복원
-            btn.disabled = false;
-            btn.textContent = originalText;
-            spinner.remove?.();
+            // 이후는 텍스트 입력과 완전히 동일한 경로다
+            await runPipeline(stt.text || '');
           } catch (err) {
             log('❌ 처리 실패: ' + err.message);
-            setStatus("❌ 오류 발생");
+            setStatus('❌ 오류 발생');
+          } finally {
+            stream.getTracks().forEach((t) => t.stop());   // 마이크 점유 해제
             btn.disabled = false;
-            btn.textContent = "🎙️ 3초 녹음";
-            spinner.remove?.();
+            btn.textContent = originalText;
+            spinner?.remove?.();
           }
         };
 
@@ -156,9 +233,10 @@ button[disabled]{opacity:0.6;cursor:not-allowed}
         setTimeout(() => { try { rec.stop(); } catch(e){} }, 3000);
       } catch (e) {
         log('❌ 마이크 요청 실패: ' + e.message);
-        setStatus("❌ 마이크 권한 거부됨");
+        setStatus('❌ 마이크 권한 거부됨 — 텍스트 입력을 사용하세요');
         btn.disabled = false;
-        btn.textContent = "🎙️ 3초 녹음";
+        btn.textContent = originalText;
+        spinner?.remove?.();
       }
     };
   };

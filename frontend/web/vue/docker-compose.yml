@@ -13,6 +13,8 @@ services:
       - TZ=Asia/Seoul
       # vite dev server 가 /administrative/* 를 프록시할 대상
       - SPRING_API_URL=http://spring-server:8081
+      # vite dev server 가 /chatbot/* 를 프록시할 대상
+      - CHATBOT_API_URL=http://voice-assistant:8080
     volumes:
       - .:/app
       # 익명 볼륨: 위의 바인드 마운트가 이미지 안의 node_modules 를 덮어써서
