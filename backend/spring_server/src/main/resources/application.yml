@@ -9,7 +9,9 @@ spring:
     password: ${DB_PASS}
 
 mybatis:
-  type-aliases-package: com.chacha.domain
+  # mapper xml 의 alias(ProvinceEntity, *QueryEntity ...)는 모두 com.chacha.entities 하위에 있다.
+  # com.chacha.domain 을 가리키면 부팅 시 alias 해결 실패로 죽는다.
+  type-aliases-package: com.chacha.entities
   mapper-locations: classpath:mapper/*.xml
   configuration:
     map-underscore-to-camel-case: true
