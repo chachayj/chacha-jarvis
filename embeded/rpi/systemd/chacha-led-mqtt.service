@@ -1,0 +1,32 @@
+# 라즈베리파이 부팅 시 MQTT LED 제어기를 자동 실행한다.
+#
+# 설치:
+#   sudo cp systemd/chacha-led-mqtt.service /etc/systemd/system/
+#   sudo systemctl daemon-reload
+#   sudo systemctl enable --now chacha-led-mqtt
+#
+# 로그:
+#   journalctl -u chacha-led-mqtt -f
+
+[Unit]
+Description=chacha-jarvis MQTT LED controller
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=chacha
+Group=chacha
+WorkingDirectory=/home/chacha/chacha-rpi
+
+# 환경에 맞게 수정한다
+Environment=BROKER=100.78.253.44
+Environment=ROBOT_ID=1
+Environment=LED_PIN=17
+ExecStart=/usr/bin/python3 -u mqtt/led_mqtt.py --broker ${BROKER} --robot-id ${ROBOT_ID} --pin ${LED_PIN}
+
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
