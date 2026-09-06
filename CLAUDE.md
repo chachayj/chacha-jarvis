@@ -47,7 +47,7 @@
 | `frontend/web/html` | 정적 HTML (V1 잔존) | 구버전 |
 | `voice-assistant` | FastAPI + faster-whisper + piper-tts/gTTS → Ollama | 음성 챗봇 (STT→LLM→TTS) |
 | `embeded/ai` | TensorFlow.js (`training-tfjs`) | 엣지 AI 학습 |
-| `embeded/ros` | rospy | 로봇 제어 |
+| `embeded/ros` | ROS 2 Jazzy / rclpy | 라즈베리파이 디바이스 제어 (MQTT↔ROS2 브리지). ROS 1 은 EOL 이라 채택 안 함 — `embeded/ros/README.md` |
 | `postgres` | PostgreSQL (`initdb/`, `schema/{OSMB,administrative}`) | DB 초기화·스키마 |
 | `emqx` | EMQX | MQTT 브로커 |
 | `nginx` | Nginx | 리버스 프록시 (self-signed 인증서) |
