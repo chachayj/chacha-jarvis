@@ -86,4 +86,7 @@ plane-selfhost/plane_pgdata*
 *.p12
 *.pfx
 *.jks
+# nginx 자체 서명 인증서는 setup_all.sh (nginx/generate-cert.sh) 가 쌍으로 생성한다.
+# key 없이 crt 만 추적하면 짝이 안 맞아 쓸 수 없으므로 둘 다 제외한다.
 nginx/selfsigned.key
+nginx/selfsigned.crt

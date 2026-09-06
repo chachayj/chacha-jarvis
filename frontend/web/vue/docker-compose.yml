@@ -11,8 +11,13 @@ services:
     environment:
       - NODE_ENV=development
       - TZ=Asia/Seoul
+      # vite dev server 가 /administrative/* 를 프록시할 대상
+      - SPRING_API_URL=http://spring-server:8081
     volumes:
       - .:/app
+      # 익명 볼륨: 위의 바인드 마운트가 이미지 안의 node_modules 를 덮어써서
+      # 'vite: not found' (exit 127) 로 죽는 걸 막는다.
+      - /app/node_modules
     command: ["npm", "run", "dev"]
     restart: unless-stopped
     networks:
