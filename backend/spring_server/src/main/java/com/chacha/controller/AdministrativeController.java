@@ -143,6 +143,8 @@ public class AdministrativeController {
         DistrictCentersListResponse body = new DistrictCentersListResponse();
         body.setDistrictCode(districtCode);
         body.setCenters(centers);
+        // setTotal 을 빼먹으면 목록이 있어도 total 이 0 으로 응답된다.
+        body.setTotal((int) service.getCentersCount(request));
 
         PagingDto paging = new PagingDto();
         paging.setPage((limit != null && limit > 0) ? (offset / Math.max(limit, 1)) + 1 : 1);
