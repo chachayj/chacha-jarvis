@@ -16,6 +16,32 @@ root경로의 README-WSL2-INSTALL.md [리드미 WSL2 인스톨](README-WSL2-INST
 
 현재 모든 세팅은 wsl 2, ubuntu 22.04 + 도커로 세팅합니다.
 
+## 빠른 시작 (스크립트)
+
+```bash
+./setup_all.sh     # 최초 1회: .env 생성, 인증서, 이미지 빌드, Ollama 모델 pull
+./run_all.sh       # 전체 스택 기동 + 포트 헬스체크 + 접속 URL 출력
+```
+
+`setup_all.sh` 는 여러 번 돌려도 안전하다 (이미 있는 `.env`·인증서는 건드리지 않는다).
+`OPEN_WEATHER_MAP_KEY` 만 본인 키를 `.env` 에 직접 채운다 — 비어 있으면 날씨 API 만 동작하지 않는다.
+
+구동 중 막히면 [로컬 구동 정상화 기록](docs/local-run-fixes.md) 을 본다 —
+과거에 스택이 뜨지 않던 원인들과 행정구역 시드 데이터 범위를 정리해 두었다.
+
+`run_all.sh` 서브커맨드:
+
+| 커맨드 | 동작 |
+| --- | --- |
+| `./run_all.sh` | 전체 스택 기동 (spring·postgres 포함) |
+| `./run_all.sh core` | 3D맵 / 챗봇 / 로봇서버 / EMQX 만 기동 |
+| `./run_all.sh status` | 컨테이너 상태 + 접속 URL |
+| `./run_all.sh logs [서비스]` | 로그 follow |
+| `./run_all.sh restart` | 재기동 |
+| `./run_all.sh down` | 전체 정지 (볼륨은 남는다) |
+
+## 수동 구동
+
 ### 1. 환경변수 파일 준비 (필수)
 
 DB 비밀번호 등 자격 증명은 레포에 없습니다. `.env` 를 직접 만들어야 컨테이너가 뜹니다.
@@ -36,6 +62,22 @@ chmod +x emqx/init_emqx.sh
 chmod +x backend/go_fiber_server/wait-for-it.sh
 ```
 
+### 3. nginx 자체 서명 인증서
+
+`nginx/selfsigned.key` 는 `.gitignore` 대상이라 레포에 없습니다. 없으면 nginx 가 뜨지 않습니다.
+
+```
+cd nginx && sh generate-cert.sh && cd ..
+```
+
+### 4. Ollama LLM 모델
+
+챗봇 NLU 가 `llama3.1:8b` 을 씁니다 (약 5GB). 없으면 챗봇 응답이 실패합니다.
+
+```
+docker compose up -d ollama
+docker exec -it ollama ollama pull llama3.1:8b
+```
 
 ```
 # 구동 커맨드
